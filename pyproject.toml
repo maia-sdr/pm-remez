@@ -1,0 +1,22 @@
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[tool.maturin]
+bindings = "pyo3"
+features = ["num-bigfloat", "openblas-static", "python"]
+no-default-features = true
+
+[project]
+name = "pm_remez"
+version = "0.1.0"
+classifiers = [
+    "Programming Language :: Rust",
+    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: Apache Software License",
+]
+description = "Parks-McClellan Remez FIR design algorithm"
+readme = "README.md"
+maintainers = [
+    {name = "Daniel Estevez", email = "daniel@destevez.net"}
+]

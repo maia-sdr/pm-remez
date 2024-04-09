@@ -1,0 +1,62 @@
+name: Rust
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - '*'
+  pull_request:
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build_test:
+    strategy:
+      fail-fast: false
+      matrix:
+        features: [openblas-system, openblas-static,
+                   netlib-system, netlib-static,
+                   intel-mkl-system, intel-mkl-static]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install OpenBLAS
+      if: matrix.features == 'openblas-system'
+      run: |
+        sudo apt-get update
+        sudo apt-get install libopenblas-dev
+    - name: Install libatlas
+      if: matrix.features == 'netlib-system'
+      run: |
+        sudo apt-get update
+        sudo apt-get install libatlas-base-dev
+    - name: Install Intel MKL
+      if: matrix.features == 'intel-mkl-system'
+      run: |
+        sudo apt-get update
+        sudo apt-get install intel-mkl
+    - name: Format
+      run: cargo fmt --all -- --check
+    - name: Clippy
+      run: cargo clippy --all-targets --features ${{ matrix.features }} -- -D warnings
+    - name: Doc
+      run: RUSTDOCFLAGS="-D warnings" cargo doc
+    - name: Build
+      run: cargo build --verbose --features ${{ matrix.features }}
+    - name: Run tests
+      run: cargo test --verbose --features ${{ matrix.features }}
+
+  publish:
+    name: Publish to crates.io
+    runs-on: ubuntu-latest
+    if: "startsWith(github.ref, 'refs/tags/')"
+    needs: build_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: katyo/publish-crates@v2
+        with:
+          registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
