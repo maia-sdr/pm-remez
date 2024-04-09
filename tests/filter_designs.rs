@@ -1,4 +1,4 @@
-use num_traits::{Float, FloatConst, One, Zero};
+use num_traits::{Float, FloatConst, Zero};
 use pm_remez::{
     constant, function, linear, pm_parameters, pm_remez, BandSetting, PMDesign, ParametersBuilder,
     Symmetry, ToLapack,
@@ -72,6 +72,7 @@ fn design_antialias_lowpass<T: Float + FloatConst + ToLapack>(
     pm_remez(&params).unwrap()
 }
 
+#[allow(clippy::too_many_arguments)]
 fn check_antialias_lowpass_response<T: Float + ToLapack<Lapack = f64>>(
     response_calculator: &mut FirResponseCalculator,
     design: &PMDesign<T>,
