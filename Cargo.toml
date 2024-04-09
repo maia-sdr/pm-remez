@@ -1,0 +1,39 @@
+[package]
+name = "pm-remez"
+version = "0.1.0"
+edition = "2021"
+authors = ["Daniel Estevez <daniel@destevez.net>"]
+description = "Parks-McClellan Remez FIR design algorithm"
+license = "MIT OR Apache-2.0"
+homepage = "https://maia-sdr.org/"
+repository = "https://github.com/maia-sdr/pm-remez/"
+keywords = ["FIR", "remez", "DSP"]
+categories = ["algorithms", "mathematics", "science"]
+
+[lib]
+name = "pm_remez"
+# "cdylib" is necessary to produce a shared library for Python to import from
+crate-type = ["cdylib", "rlib"]
+
+[features]
+# LAPACK backend features forwarded to ndarray-linalg
+openblas-static = ["ndarray-linalg/openblas-static"]
+openblas-system = ["ndarray-linalg/openblas-system"]
+netlib-static = ["ndarray-linalg/netlib-static"]
+netlib-system = ["ndarray-linalg/netlib-system"]
+intel-mkl-static = ["ndarray-linalg/intel-mkl-static"]
+intel-mkl-system = ["ndarray-linalg/intel-mkl-system"]
+
+python = ["pyo3"]
+
+[dependencies]
+itertools = "0.12.1"
+ndarray = "0.15.6"
+ndarray-linalg = { version = "0.16", default-features = false }
+num-bigfloat = { version = "1.7.1", optional = true }
+num-traits = "0.2"
+pyo3 = { version = "0.21", optional = true, features = ["abi3-py38", "extension-module"] }
+thiserror = "1"
+
+[dev-dependencies]
+rustfft = "6.2"
