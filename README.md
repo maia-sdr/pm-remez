@@ -49,6 +49,17 @@ documentation of the Rust crate contains a few examples of the Rust API. The
 Python examples can also be written in Rust (and in fact this is done
 [as part of integration testing](tests/filter_designs.rs)).
 
+## Python package
+
+The pm-remez Python package is [published in
+PyPI](https://pypi.org/project/pm-remez/). There are pre-built binary packages
+for common architectures and operating systems. For these, the package can be
+installed by doing
+
+```
+pip install pm-remez
+```
+
 ## Building
 
 The pm-remez crate uses [ndarray-linalg](https://docs.rs/ndarray-linalg/) to
