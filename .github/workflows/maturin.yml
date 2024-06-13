@@ -111,7 +111,7 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-          - runner: macos-latest
+          - runner: macos-13
             target: x86_64
           - runner: macos-14
             target: aarch64
