@@ -1,6 +1,6 @@
 [package]
 name = "pm-remez"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Daniel Estevez <daniel@destevez.net>"]
 description = "Parks-McClellan Remez FIR design algorithm"
@@ -27,12 +27,13 @@ intel-mkl-system = ["ndarray-linalg/intel-mkl-system"]
 python = ["pyo3"]
 
 [dependencies]
-itertools = "0.12.1"
+itertools = "0.13"
+# do not use ndarray 0.16 until ndarray-linalg has been updated to use it
 ndarray = "0.15.6"
 ndarray-linalg = { version = "0.16", default-features = false }
 num-bigfloat = { version = "1.7.1", optional = true }
 num-traits = "0.2"
-pyo3 = { version = "0.21", optional = true, features = ["abi3-py38", "extension-module"] }
+pyo3 = { version = "0.22", optional = true, features = ["abi3-py38", "extension-module"] }
 thiserror = "1"
 
 [dev-dependencies]
