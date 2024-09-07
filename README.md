@@ -8,7 +8,7 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[crates-badge]: https://buildstats.info/crate/pm-remez
+[crates-badge]: https://img.shields.io/crates/v/pm-remez
 [crates-url]: https://crates.io/crates/pm-remez
 [docs-badge]: https://docs.rs/pm-remez/badge.svg
 [docs-url]: https://docs.rs/pm-remez
