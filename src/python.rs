@@ -31,6 +31,7 @@ use pyo3::{
 #[pymodule]
 fn pm_remez(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(remez, m)?)?;
+    m.add_function(wrap_pyfunction!(ichige, m)?)?;
     m.add_class::<PMDesign>()?;
     m.add("__version__", env!("CARGO_PKG_VERSION"))?;
     m.add("__author__", env!("CARGO_PKG_AUTHORS"))?;
@@ -798,4 +799,32 @@ impl F64Conversion for BigFloat {
     fn to_f64(&self) -> f64 {
         self.to_f64()
     }
+}
+
+/// Estimates the required Parks-McClellan FIR length using the estimate from a
+/// paper by Ichige etl.
+///
+/// This function uses the estimate presented in the following paper:
+///
+/// K. Ichige, M. Iwaki and R. Ishii, "Accurate estimation of minimum filter
+/// length for optimum FIR digital filters," in IEEE Transactions on Circuits and
+/// Systems II: Analog and Digital Signal Processing, vol. 47, no. 10,
+/// pp. 1008-1016, Oct. 2000.
+///
+/// Parameters
+/// ----------
+/// fp : float
+///     Passband edge frequency (normalized to a sample rate of 1)
+/// delta_f : float
+///     Transition bandwidth, defined as the difference between the stopband
+///     edge and passband edge frequencies (both normalized to a sample rate
+///     of 1).
+/// delta_p : float
+///     Passband ripple.
+/// delta_s : float
+///     Stopband ripple.
+#[pyfunction]
+#[pyo3(signature = (fp, delta_f, delta_p, delta_s))]
+fn ichige(fp: f64, delta_f: f64, delta_p: f64, delta_s: f64) -> usize {
+    crate::order_estimates::ichige(fp, delta_f, delta_p, delta_s)
 }
