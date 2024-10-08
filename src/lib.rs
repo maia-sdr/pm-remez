@@ -134,6 +134,7 @@ mod fir_types;
 use fir_types::*;
 mod lapack;
 pub use lapack::{IsLapack, ToLapack};
+pub mod order_estimates;
 #[cfg(feature = "python")]
 mod python;
 mod requirements;
