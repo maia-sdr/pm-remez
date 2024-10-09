@@ -9,7 +9,7 @@ no-default-features = true
 
 [project]
 name = "pm_remez"
-version = "0.1.2"
+version = "0.1.3"
 classifiers = [
     "Programming Language :: Rust",
     "License :: OSI Approved :: MIT License",

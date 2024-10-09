@@ -561,8 +561,7 @@ dependencies = [
 [[package]]
 name = "lax"
 version = "0.16.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1f96a229d9557112e574164f8024ce703625ad9f88a90964c1780809358e53da"
+source = "git+https://github.com/mike-kfed/ndarray-linalg.git?rev=cef6aa5e95d8d595e546fe82d09e83d1e1861f5a#cef6aa5e95d8d595e546fe82d09e83d1e1861f5a"
 dependencies = [
  "cauchy",
  "intel-mkl-src",
@@ -881,7 +880,7 @@ checksum = "953ec861398dccce10c670dfeaf3ec4911ca479e9c02154b3a215178c5f566f2"
 
 [[package]]
 name = "pm-remez"
-version = "0.1.2"
+version = "0.1.3"
 dependencies = [
  "itertools",
  "ndarray",
