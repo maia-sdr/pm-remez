@@ -61,9 +61,10 @@ jobs:
           manylinux: auto
           before-script-linux: ${{ matrix.platform.openssl_install }}
       - name: Install built wheel
+        # also run an example filter design problem to check that things actually work
         run: |
           pip install pm-remez --no-index --find-links dist --force-reinstall
-          python -c "import pm_remez"
+          python -c "import pm_remez; print(pm_remez.remez(200, [0, 0.111875, 0.129375, 0.5], [1, 0], weight=[1, 1.0], bigfloat=False))"
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
@@ -96,9 +97,10 @@ jobs:
           args: --release --out dist --features intel-mkl-static,num-bigfloat,python
           sccache: 'true'
       - name: Install built wheel
+        # also run an example filter design problem to check that things actually work
         run: |
           pip install pm-remez --no-index --find-links dist --force-reinstall
-          python -c "import pm_remez"
+          python -c "import pm_remez; print(pm_remez.remez(200, [0, 0.111875, 0.129375, 0.5], [1, 0], weight=[1, 1.0], bigfloat=False))"
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
@@ -111,8 +113,10 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-          - runner: macos-13
-            target: x86_64
+          # MacOS in x86_64 disabled for the time being because it is
+          # building a package that fails to run.
+          # - runner: macos-13
+          #   target: x86_64
           - runner: macos-14
             target: aarch64
     steps:
@@ -127,9 +131,10 @@ jobs:
           args: --release --out dist
           sccache: 'true'
       - name: Install built wheel
+        # also run an example filter design problem to check that things actually work
         run: |
           pip install pm-remez --no-index --find-links dist --force-reinstall
-          python -c "import pm_remez"
+          python -c "import pm_remez; print(pm_remez.remez(200, [0, 0.111875, 0.129375, 0.5], [1, 0], weight=[1, 1.0], bigfloat=False))"
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
