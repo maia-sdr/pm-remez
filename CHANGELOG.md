@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.7] - 2025-03-25
+
+### Changed
+
+- Updated dependencies to fix ring security advisory.
+
 ## [0.1.6] - 2025-02-10
+
+### Changed
 
 - Updated dependencies to fix openssl security advisory.
 
@@ -52,7 +60,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First release of pm-remez.
 
-[unreleased]: https://github.com/maia-sdr/pm-remez/compare/v0.1.6...HEAD
+[unreleased]: https://github.com/maia-sdr/pm-remez/compare/v0.1.7...HEAD
+[0.1.7]: https://github.com/maia-sdr/pm-remez/compare/v0.1.6...v0.1.7
 [0.1.6]: https://github.com/maia-sdr/pm-remez/compare/v0.1.5...v0.1.6
 [0.1.5]: https://github.com/maia-sdr/pm-remez/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/maia-sdr/pm-remez/compare/v0.1.3...v0.1.4
