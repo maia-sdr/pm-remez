@@ -1,9 +1,9 @@
 use num_traits::{Float, FloatConst, Zero};
 use pm_remez::{
-    constant, function, linear, pm_parameters, pm_remez, BandSetting, PMDesign, ParametersBuilder,
-    Symmetry, ToLapack,
+    BandSetting, PMDesign, ParametersBuilder, Symmetry, ToLapack, constant, function, linear,
+    pm_parameters, pm_remez,
 };
-use rustfft::{num_complex::Complex, Fft, FftPlanner};
+use rustfft::{Fft, FftPlanner, num_complex::Complex};
 use std::{f64::consts::PI, sync::Arc};
 
 #[cfg(feature = "num-bigfloat")]
