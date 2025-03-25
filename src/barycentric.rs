@@ -103,11 +103,7 @@ pub fn compute_lagrange_abscisa<'a, T: Float>(
         .enumerate()
         .map(move |(k, (&des, &wei))| {
             let z = delta / wei;
-            if k % 2 != 0 {
-                des + z
-            } else {
-                des - z
-            }
+            if k % 2 != 0 { des + z } else { des - z }
         })
 }
 

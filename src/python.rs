@@ -1,6 +1,6 @@
 use crate::{
-    constant, error::Error, function, linear, pm_parameters, BandSetting, ParametersBuilder,
-    Setting, Symmetry,
+    BandSetting, ParametersBuilder, Setting, Symmetry, constant, error::Error, function, linear,
+    pm_parameters,
 };
 use num_bigfloat::BigFloat;
 use pyo3::{
@@ -625,7 +625,7 @@ fn remez(
         _ => {
             return Err(PyValueError::new_err(
                 "symmetry must be \"even\" or \"odd\"",
-            ))
+            ));
         }
     };
     if bigfloat {

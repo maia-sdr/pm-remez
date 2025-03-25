@@ -122,7 +122,7 @@ pub fn find_extrema_in_subinterval<'a, T, D, W>(
     yk: &'a [T],
     desired: D,
     weights: W,
-) -> Result<impl Iterator<Item = ExtremaCandidate<T>> + 'a>
+) -> Result<impl Iterator<Item = ExtremaCandidate<T>>>
 where
     T: Float + FloatConst + ToLapack,
     D: Fn(T) -> T + 'a,

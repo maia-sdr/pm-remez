@@ -138,7 +138,7 @@ pub mod order_estimates;
 #[cfg(feature = "python")]
 mod python;
 mod requirements;
-pub use requirements::{constant, function, linear, pm_parameters, BandSetting, Setting};
+pub use requirements::{BandSetting, Setting, constant, function, linear, pm_parameters};
 mod types;
 pub use types::{Band, DesignParameters, PMDesign, PMParameters, ParametersBuilder, Symmetry};
 

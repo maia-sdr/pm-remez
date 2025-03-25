@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated dependencies to fix ring security advisory.
+- Update to Rust edition 2024.
 
 ## [0.1.6] - 2025-02-10
 
