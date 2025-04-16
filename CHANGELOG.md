@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.8] - 2025-04-13
+
+### Changed
+
+- Updated dependencies to fix rust-openssl and pyo3 security advisories.
+
 ## [0.1.7] - 2025-03-25
 
 ### Changed
