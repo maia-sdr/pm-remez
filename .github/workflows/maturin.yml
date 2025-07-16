@@ -113,10 +113,8 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-          # MacOS in x86_64 disabled for the time being because it is
-          # building a package that fails to run.
-          # - runner: macos-13
-          #   target: x86_64
+          - runner: macos-14
+            target: x86_64
           - runner: macos-14
             target: aarch64
     steps:
