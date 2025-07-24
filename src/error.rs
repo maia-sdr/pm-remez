@@ -1,6 +1,5 @@
 //! Error types used by `pm_remez`.
 
-use ndarray_linalg::error::LinalgError;
 use thiserror::Error;
 
 /// `pm_remez` `Result` type.
@@ -36,7 +35,7 @@ pub enum Error {
     /// happen due to numerical errors. It prevents the Remez exchange algorithm
     /// from continuing.
     #[error("unable to compute eigenvalues: {0}")]
-    EigenvaluesError(LinalgError),
+    EigenvaluesError(String),
     /// The desired response that was specified is invalid for this type of FIR
     /// filter.
     #[error("invalid desired response: {0}")]

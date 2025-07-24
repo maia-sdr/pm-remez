@@ -1,13 +1,28 @@
+// needed because there are many unused things if there are no eigenvalue
+// backends selected via features
+#![cfg_attr(
+    not(any(feature = "lapack-backend", feature = "faer-backend")),
+    allow(dead_code)
+)]
+
 use num_traits::{Float, FloatConst, Zero};
 use pm_remez::{
-    BandSetting, PMDesign, ParametersBuilder, Symmetry, ToLapack, constant, function, linear,
-    pm_parameters, pm_remez,
+    BandSetting, Convf64, EigenvalueBackend, PMDesign, ParametersBuilder, Symmetry, constant,
+    function, linear, pm_parameters, pm_remez_with_backend,
 };
 use rustfft::{Fft, FftPlanner, num_complex::Complex};
 use std::{f64::consts::PI, sync::Arc};
 
+#[cfg(feature = "lapack-backend")]
+use pm_remez::LapackBackend;
+
+#[cfg(feature = "faer-backend")]
+use pm_remez::FaerBackend;
+
 #[cfg(feature = "num-bigfloat")]
 use num_bigfloat::BigFloat;
+#[cfg(feature = "num-bigfloat")]
+use num_traits::One;
 
 struct FirResponseCalculator {
     fft: Arc<dyn Fft<f64>>,
@@ -32,27 +47,32 @@ impl FirResponseCalculator {
             .collect()
     }
 
-    fn compute<T: ToLapack<Lapack = f64>>(&mut self, taps: &[T]) -> Vec<T> {
+    fn compute<T: Convf64>(&mut self, taps: &[T]) -> Vec<T> {
         assert!(taps.len() <= self.buffer.len());
         self.buffer.fill(Complex::zero());
         for (b, t) in self.buffer.iter_mut().zip(taps.iter()) {
-            *b = t.to_lapack().into();
+            *b = t.to_f64().into();
         }
         self.fft.process(&mut self.buffer);
         self.buffer[..self.buffer.len() / 2]
             .iter()
-            .map(|z| T::from_lapack(&z.norm()))
+            .map(|z| T::from_f64(z.norm()))
             .collect()
     }
 }
 
-fn design_antialias_lowpass<T: Float + FloatConst + ToLapack>(
+fn design_antialias_lowpass<T, B>(
     decimation: usize,
     transition_bandwidth: T,
     numtaps: usize,
     stopband_weight: T,
     one_over_f: bool,
-) -> PMDesign<T> {
+    eigenvalue_backend: &B,
+) -> PMDesign<T>
+where
+    T: Float + FloatConst,
+    B: EigenvalueBackend<T>,
+{
     let zero = T::zero();
     let one = T::one();
     let half = T::from(0.5).unwrap();
@@ -69,11 +89,11 @@ fn design_antialias_lowpass<T: Float + FloatConst + ToLapack>(
         BandSetting::with_weight(stopband_start, half, constant(zero), stopband_weight).unwrap(),
     ];
     let params = pm_parameters(numtaps, &bands).unwrap();
-    pm_remez(&params).unwrap()
+    pm_remez_with_backend(&params, eigenvalue_backend).unwrap()
 }
 
 #[allow(clippy::too_many_arguments)]
-fn check_antialias_lowpass_response<T: Float + ToLapack<Lapack = f64>>(
+fn check_antialias_lowpass_response<T: Float + Convf64>(
     response_calculator: &mut FirResponseCalculator,
     design: &PMDesign<T>,
     decimation: usize,
@@ -105,12 +125,11 @@ fn check_antialias_lowpass_response<T: Float + ToLapack<Lapack = f64>>(
     }
 }
 
-#[test]
-fn lowpass() {
+fn lowpass<B: EigenvalueBackend<f64>>(eigenvalue_backend: &B) {
     let mut response_calculator = FirResponseCalculator::new(4096);
     let tolerance = 1e-10;
     let end_skip = 0.0;
-    let design = design_antialias_lowpass(2, 0.2f64, 35, 1.0, false);
+    let design = design_antialias_lowpass(2, 0.2f64, 35, 1.0, false, eigenvalue_backend);
     assert!(design.weighted_error < 6.8e-4);
     check_antialias_lowpass_response(
         &mut response_calculator,
@@ -124,12 +143,23 @@ fn lowpass() {
     );
 }
 
+#[cfg(feature = "lapack-backend")]
 #[test]
-fn lowpass_stopband_weight() {
+fn lowpass_lapack() {
+    lowpass(&LapackBackend::default());
+}
+
+#[cfg(feature = "faer-backend")]
+#[test]
+fn lowpass_faer() {
+    lowpass(&FaerBackend::default());
+}
+
+fn lowpass_stopband_weight<B: EigenvalueBackend<f64>>(eigenvalue_backend: &B) {
     let mut response_calculator = FirResponseCalculator::new(4096);
     let tolerance = 1e-10;
     let end_skip = 0.0;
-    let design = design_antialias_lowpass(2, 0.2f64, 35, 10.0, false);
+    let design = design_antialias_lowpass(2, 0.2f64, 35, 10.0, false, eigenvalue_backend);
     assert!(design.weighted_error < 2.9e-3);
     check_antialias_lowpass_response(
         &mut response_calculator,
@@ -143,12 +173,23 @@ fn lowpass_stopband_weight() {
     );
 }
 
+#[cfg(feature = "lapack-backend")]
 #[test]
-fn lowpass_one_over_f() {
+fn lowpass_stopband_weight_lapack() {
+    lowpass_stopband_weight(&LapackBackend::default());
+}
+
+#[cfg(feature = "faer-backend")]
+#[test]
+fn lowpass_stopband_weight_faer() {
+    lowpass_stopband_weight(&FaerBackend::default());
+}
+
+fn lowpass_one_over_f<B: EigenvalueBackend<f64>>(eigenvalue_backend: &B) {
     let mut response_calculator = FirResponseCalculator::new(4096);
     let tolerance = 1e-10;
     let end_skip = 0.0;
-    let design = design_antialias_lowpass(4, 0.2f64, 67, 10.0, true);
+    let design = design_antialias_lowpass(4, 0.2f64, 67, 10.0, true, eigenvalue_backend);
     assert!(design.weighted_error < 3.4e-3);
     check_antialias_lowpass_response(
         &mut response_calculator,
@@ -162,13 +203,31 @@ fn lowpass_one_over_f() {
     );
 }
 
+#[cfg(feature = "lapack-backend")]
 #[test]
+fn lowpass_one_over_f_lapack() {
+    lowpass_one_over_f(&LapackBackend::default());
+}
+
+#[cfg(feature = "faer-backend")]
+#[test]
+fn lowpass_one_over_f_faer() {
+    lowpass_one_over_f(&FaerBackend::default());
+}
+
 #[cfg(feature = "num-bigfloat")]
-fn lowpass_bigfloat() {
+fn lowpass_bigfloat<B: EigenvalueBackend<BigFloat>>(eigenvalue_backend: &B) {
     let mut response_calculator = FirResponseCalculator::new(4096);
     let tolerance = 1e-10;
     let end_skip = 0.0;
-    let design = design_antialias_lowpass(4, BigFloat::from(0.1), 512, BigFloat::one(), true);
+    let design = design_antialias_lowpass(
+        4,
+        BigFloat::from(0.1),
+        512,
+        BigFloat::one(),
+        true,
+        eigenvalue_backend,
+    );
     assert!(design.weighted_error < BigFloat::from(1.9e-10));
     check_antialias_lowpass_response(
         &mut response_calculator,
@@ -182,8 +241,19 @@ fn lowpass_bigfloat() {
     );
 }
 
+#[cfg(all(feature = "num-bigfloat", feature = "lapack-backend"))]
 #[test]
-fn polyphase_filterbank() {
+fn lowpass_bigfloat_lapack() {
+    lowpass_bigfloat(&LapackBackend::default());
+}
+
+#[cfg(all(feature = "num-bigfloat", feature = "faer-backend"))]
+#[test]
+fn lowpass_bigfloat_faer() {
+    lowpass_bigfloat(&FaerBackend::default());
+}
+
+fn polyphase_filterbank<B: EigenvalueBackend<f64>>(eigenvalue_backend: &B) {
     let mut response_calculator = FirResponseCalculator::new(1 << 18);
     let tolerance = 1e-8;
     // ignore the response near Nyquist, since it regrows slightly, rather than
@@ -198,6 +268,7 @@ fn polyphase_filterbank() {
         num_channels * taps_per_channel,
         4.0,
         true,
+        eigenvalue_backend,
     );
     assert!(design.weighted_error < 0.22);
     check_antialias_lowpass_response(
@@ -212,8 +283,19 @@ fn polyphase_filterbank() {
     );
 }
 
+#[cfg(feature = "lapack-backend")]
 #[test]
-fn bandpass() {
+fn polyphase_filterbank_lapack() {
+    polyphase_filterbank(&LapackBackend::default());
+}
+
+#[cfg(feature = "faer-backend")]
+#[test]
+fn polyphase_filterbank_faer() {
+    polyphase_filterbank(&FaerBackend::default());
+}
+
+fn bandpass<B: EigenvalueBackend<f64>>(eigenvalue_backend: &B) {
     let bands = [
         BandSetting::new(0.0, 0.075, constant(0.0)).unwrap(),
         BandSetting::new(0.1, 0.2, constant(1.0)).unwrap(),
@@ -222,7 +304,7 @@ fn bandpass() {
         BandSetting::new(0.425, 0.5, constant(0.0)).unwrap(),
     ];
     let params = pm_parameters(135, &bands).unwrap();
-    let design = pm_remez(&params).unwrap();
+    let design = pm_remez_with_backend(&params, eigenvalue_backend).unwrap();
     assert!(design.weighted_error < 9.4e-4);
     let mut response_calculator = FirResponseCalculator::new(4096);
     let tolerance = 1e-10;
@@ -242,12 +324,25 @@ fn bandpass() {
     }
 }
 
-fn design_cic_compensation(
+#[cfg(feature = "lapack-backend")]
+#[test]
+fn bandpass_lapack() {
+    bandpass(&LapackBackend::default());
+}
+
+#[cfg(feature = "faer-backend")]
+#[test]
+fn bandpass_faer() {
+    bandpass(&FaerBackend::default());
+}
+
+fn design_cic_compensation<B: EigenvalueBackend<f64>>(
     cic_stages: usize,
     cic_decimation: usize,
     decimation: usize,
     transition_bandwidth: f64,
     numtaps: usize,
+    eigenvalue_backend: &B,
 ) -> PMDesign<f64> {
     let passband_end = 0.5 * (1.0 - transition_bandwidth) / decimation as f64;
     let stopband_start = 0.5 * (1.0 + transition_bandwidth) / decimation as f64;
@@ -267,7 +362,7 @@ fn design_cic_compensation(
         BandSetting::new(stopband_start, 0.5, constant(0.0)).unwrap(),
     ];
     let params = pm_parameters(numtaps, &bands).unwrap();
-    pm_remez(&params).unwrap()
+    pm_remez_with_backend(&params, eigenvalue_backend).unwrap()
 }
 
 fn check_cic_compensation_response(
@@ -301,23 +396,38 @@ fn check_cic_compensation_response(
     }
 }
 
-#[test]
-fn cic_compensation() {
-    let design = design_cic_compensation(4, 5, 3, 0.2, 53);
+fn cic_compensation<B: EigenvalueBackend<f64>>(eigenvalue_backend: &B) {
+    let design = design_cic_compensation(4, 5, 3, 0.2, 53, eigenvalue_backend);
     assert!(design.weighted_error < 8.3e-4);
     let mut response_calculator = FirResponseCalculator::new(4096);
     let tolerance = 1e-10;
     check_cic_compensation_response(&mut response_calculator, &design, 4, 5, 3, 0.2, tolerance);
 }
 
-fn design_hilbert(transition_bandwidth: f64, numtaps: usize) -> PMDesign<f64> {
+#[cfg(feature = "lapack-backend")]
+#[test]
+fn cic_compensation_lapack() {
+    cic_compensation(&LapackBackend::default());
+}
+
+#[cfg(feature = "faer-backend")]
+#[test]
+fn cic_compensation_faer() {
+    cic_compensation(&FaerBackend::default());
+}
+
+fn design_hilbert<B: EigenvalueBackend<f64>>(
+    transition_bandwidth: f64,
+    numtaps: usize,
+    eigenvalue_backend: &B,
+) -> PMDesign<f64> {
     assert!(numtaps % 2 == 1);
     let allpass_begin = 0.25 * transition_bandwidth;
     let allpass_end = 0.5 - 0.25 * transition_bandwidth;
     let bands = [BandSetting::new(allpass_begin, allpass_end, constant(1.0)).unwrap()];
     let mut params = pm_parameters(numtaps, &bands).unwrap();
     params.set_symmetry(Symmetry::Odd);
-    pm_remez(&params).unwrap()
+    pm_remez_with_backend(&params, eigenvalue_backend).unwrap()
 }
 
 fn check_hilbert_response(
@@ -338,22 +448,37 @@ fn check_hilbert_response(
     }
 }
 
-#[test]
-fn hilbert() {
-    let design = design_hilbert(0.1, 43);
+fn hilbert<B: EigenvalueBackend<f64>>(eigenvalue_backend: &B) {
+    let design = design_hilbert(0.1, 43, eigenvalue_backend);
     assert!(design.weighted_error < 0.015);
     let mut response_calculator = FirResponseCalculator::new(4096);
     let tolerance = 1e-10;
     check_hilbert_response(&mut response_calculator, &design, 0.1, tolerance);
 }
 
-fn design_differentiator(transition_bandwidth: f64, numtaps: usize) -> PMDesign<f64> {
+#[cfg(feature = "lapack-backend")]
+#[test]
+fn hilbert_lapack() {
+    hilbert(&LapackBackend::default());
+}
+
+#[cfg(feature = "faer-backend")]
+#[test]
+fn hilbert_faer() {
+    hilbert(&FaerBackend::default());
+}
+
+fn design_differentiator<B: EigenvalueBackend<f64>>(
+    transition_bandwidth: f64,
+    numtaps: usize,
+    eigenvalue_backend: &B,
+) -> PMDesign<f64> {
     assert!(numtaps % 2 == 1);
     let allpass_end = 0.5 - 0.5 * transition_bandwidth;
     let bands = [BandSetting::new(0.0, allpass_end, linear(0.0, allpass_end)).unwrap()];
     let mut params = pm_parameters(numtaps, &bands).unwrap();
     params.set_symmetry(Symmetry::Odd);
-    pm_remez(&params).unwrap()
+    pm_remez_with_backend(&params, eigenvalue_backend).unwrap()
 }
 
 fn check_differentiator_response(
@@ -373,11 +498,22 @@ fn check_differentiator_response(
     }
 }
 
-#[test]
-fn differentiator() {
-    let design = design_differentiator(0.1, 43);
+fn differentiator<B: EigenvalueBackend<f64>>(eigenvalue_backend: &B) {
+    let design = design_differentiator(0.1, 43, eigenvalue_backend);
     assert!(design.weighted_error < 2e-4);
     let mut response_calculator = FirResponseCalculator::new(4096);
     let tolerance = 1e-5;
     check_differentiator_response(&mut response_calculator, &design, 0.1, tolerance);
+}
+
+#[cfg(feature = "lapack-backend")]
+#[test]
+fn differentiator_lapack() {
+    differentiator(&LapackBackend::default());
+}
+
+#[cfg(feature = "faer-backend")]
+#[test]
+fn differentiator_faer() {
+    differentiator(&FaerBackend::default());
 }

@@ -18,37 +18,44 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        features: [openblas-system, openblas-static,
-                   netlib-system, netlib-static,
-                   intel-mkl-system, intel-mkl-static]
+        lapack: ["lapack-backend,openblas-system",
+                 "lapack-backend,openblas-static",
+                 "lapack-backend,netlib-system",
+                 "lapack-backend,netlib-static",
+                 "lapack-backend,intel-mkl-system",
+                 ""]
+        faer: [faer-backend, ""]
+        
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - name: Install OpenBLAS
-      if: matrix.features == 'openblas-system'
+      if: matrix.lapack == 'lapack-backend,openblas-system'
       run: |
         sudo apt-get update
         sudo apt-get install libopenblas-dev
     - name: Install libatlas
-      if: matrix.features == 'netlib-system'
+      if: matrix.lapack == 'lapack-backend,netlib-system'
       run: |
         sudo apt-get update
         sudo apt-get install libatlas-base-dev
     - name: Install Intel MKL
-      if: matrix.features == 'intel-mkl-system'
+      if: matrix.lapack == 'lapack-backend,intel-mkl-system'
       run: |
         sudo apt-get update
         sudo apt-get install intel-mkl
     - name: Format
       run: cargo fmt --all -- --check
     - name: Clippy
-      run: cargo clippy --all-targets --features ${{ matrix.features }} -- -D warnings
+      run: cargo clippy --all-targets --features ${{matrix.lapack}},${{matrix.faer}}, --no-default-features -- -D warnings
     - name: Doc
-      run: RUSTDOCFLAGS="-D warnings" cargo doc
+      # lapack-backend and num-bigfloat are needed to build docs, since otherwise there
+      # are warnings due to missing references to these crates
+      run: RUSTDOCFLAGS="-D warnings" cargo doc --features lapack-backend,num-bigfloat
     - name: Build
-      run: cargo build --verbose --features ${{ matrix.features }}
+      run: cargo build --verbose --features ${{matrix.lapack}},${{matrix.faer}}, --no-default-features
     - name: Run tests
-      run: cargo test --verbose --features ${{ matrix.features }}
+      run: cargo test --verbose --features ${{matrix.lapack}},${{matrix.faer}}, --no-default-features
 
   publish:
     name: Publish to crates.io
