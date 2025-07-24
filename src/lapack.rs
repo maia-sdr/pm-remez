@@ -32,7 +32,7 @@ pub trait ToLapack: Sized + 'static {
     }
 }
 
-/// Marker trait used to mark for which types that have the trait [`Lapack`](ndarray_linalg),
+/// Marker trait used to mark for which types that have the trait [`Lapack`](ndarray_linalg::Lapack),
 /// the trait [`ToLapack`] should be implemented as a no-op conversion.
 ///
 /// A marker trait is needed because since `Lapack` is defined by an upstream
@@ -74,6 +74,6 @@ impl ToLapack for num_bigfloat::BigFloat {
     }
 
     fn from_lapack(lapack: &Self::Lapack) -> Self {
-        num_bigfloat::BigFloat::from_f64(*lapack)
+        Self::from_f64(*lapack)
     }
 }

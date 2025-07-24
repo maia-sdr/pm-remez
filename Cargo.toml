@@ -16,20 +16,30 @@ name = "pm_remez"
 crate-type = ["cdylib", "rlib"]
 
 [features]
+default = ["faer-backend"]
+
+# LAPACK eigenvalue backend using ndarray-linalg
+lapack-backend = ["dep:ndarray-linalg"]
+# faer eigenvalue backend
+faer-backend = ["dep:faer", "dep:faer-ext"]
+
 # LAPACK backend features forwarded to ndarray-linalg
-openblas-static = ["ndarray-linalg/openblas-static"]
-openblas-system = ["ndarray-linalg/openblas-system"]
-netlib-static = ["ndarray-linalg/netlib-static"]
-netlib-system = ["ndarray-linalg/netlib-system"]
-intel-mkl-static = ["ndarray-linalg/intel-mkl-static"]
-intel-mkl-system = ["ndarray-linalg/intel-mkl-system"]
+openblas-static = ["lapack-backend", "ndarray-linalg/openblas-static"]
+openblas-system = ["lapack-backend", "ndarray-linalg/openblas-system"]
+netlib-static = ["lapack-backend", "ndarray-linalg/netlib-static"]
+netlib-system = ["lapack-backend", "ndarray-linalg/netlib-system"]
+intel-mkl-static = ["lapack-backend", "ndarray-linalg/intel-mkl-static"]
+intel-mkl-system = ["lapack-backend", "ndarray-linalg/intel-mkl-system"]
 
 python = ["pyo3"]
 
 [dependencies]
+faer = { version = "0.22.6", optional = true }
+faer-ext = { version = "0.6.0", features = ["ndarray"], optional = true }
 itertools = "0.14"
 ndarray = "0.16"
-ndarray-linalg = { version = "0.17", default-features = false }
+ndarray-linalg = { version = "0.17", default-features = false, optional = true }
+num = "0.4.3"
 num-bigfloat = { version = "1.7.1", optional = true }
 num-traits = "0.2"
 pyo3 = { version = "0.24", optional = true, features = ["abi3-py38", "extension-module"] }

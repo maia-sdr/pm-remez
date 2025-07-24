@@ -1,10 +1,9 @@
 use crate::barycentric::{compute_error, compute_extrema_candidate};
 use crate::compute_cheby_coefficients;
+use crate::eigenvalues::EigenvalueBackend;
 use crate::error::{Error, Result};
-use crate::lapack::ToLapack;
 use crate::types::Band;
 use ndarray::Array2;
-use ndarray_linalg::{EigVals, Scalar};
 use num_traits::{Float, FloatConst};
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
@@ -114,7 +113,8 @@ pub fn subdivide<T: Float>(x: &[T], bands_x: &[Interval<T>]) -> Vec<Interval<T>>
 }
 
 // Find local extrema of error function in subinterval using Chebyshev proxy method
-pub fn find_extrema_in_subinterval<'a, T, D, W>(
+#[allow(clippy::too_many_arguments)]
+pub fn find_extrema_in_subinterval<'a, T, D, W, B: EigenvalueBackend<T>>(
     interval: &Interval<T>,
     cheby_nodes: &[T],
     x: &'a [T],
@@ -122,9 +122,10 @@ pub fn find_extrema_in_subinterval<'a, T, D, W>(
     yk: &'a [T],
     desired: D,
     weights: W,
+    eigenvalue_backend: &B,
 ) -> Result<impl Iterator<Item = ExtremaCandidate<T>>>
 where
-    T: Float + FloatConst + ToLapack,
+    T: Float + FloatConst,
     D: Fn(T) -> T + 'a,
     W: Fn(T) -> T + 'a,
 {
@@ -183,25 +184,23 @@ where
     }
     // Balance matrix for better numerical conditioning
     balance_matrix(&mut colleague);
-    // Convert colleague matrix to a numerical representation that can be used with Lapack
-    let colleague = T::array_to_lapack(colleague);
 
     // Compute eigenvalues of colleague matrix. These are the roots of the
     // derivative of the proxy.
-    let eig = colleague.eigvals().map_err(Error::EigenvaluesError)?;
+    let eig = eigenvalue_backend.eigenvalues(colleague)?;
 
     // Filter only the roots that are real and inside [-1, 1]. Map them to
     // the original interval.
     //
     // The threshold scalar is real, but the type system doesn't know, so we
     // need to call re.
-    let threshold = T::from(1e-20).unwrap().to_lapack().re();
+    let threshold = T::from(1e-20).unwrap();
     let limits = -T::one()..=T::one();
     let scale = T::from(0.5).unwrap() * (interval.end - interval.begin);
     let begin = interval.begin;
     Ok(eig.into_iter().filter_map(move |z| {
-        if Float::abs(z.im()) < threshold {
-            let x0 = T::from_lapack(&<T::Lapack>::from_real(z.re()));
+        if Float::abs(z.im) < threshold {
+            let x0 = z.re;
             if limits.contains(&x0) {
                 // map root to interval
                 let y = (x0 + T::one()) * scale + begin;

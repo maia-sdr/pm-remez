@@ -35,6 +35,7 @@
 //! `linear` or `function`.
 //!
 //! ```
+//! # #[cfg(any(feature = "lapack-backend", feature = "faer-backend"))]
 //! # fn main() -> Result<(), pm_remez::error::Error> {
 //! use pm_remez::{
 //!     constant, pm_parameters, pm_remez,
@@ -49,6 +50,8 @@
 //! let design = pm_remez(&parameters)?;
 //! # Ok(())
 //! # }
+//! # #[cfg(not(any(feature = "lapack-backend", feature = "faer-backend")))]
+//! # fn main() {}
 //! ```
 //!
 //! The second style is closer to how the `pm_remez` function is implemented. It
@@ -61,6 +64,7 @@
 //! This designs the same lowpass filter using this second coding style.
 //!
 //! ```
+//! # #[cfg(any(feature = "lapack-backend", feature = "faer-backend"))]
 //! # fn main() -> Result<(), pm_remez::error::Error> {
 //! use pm_remez::{pm_remez, Band, BandSetting, PMParameters};
 //! let num_taps = 35;
@@ -73,6 +77,8 @@
 //! let design = pm_remez(&parameters)?;
 //! # Ok(())
 //! # }
+//! # #[cfg(not(any(feature = "lapack-backend", feature = "faer-backend")))]
+//! # fn main() {}
 //! ```
 //!
 //! The [documentation of the Python bindings](https://pm-remez.readthedocs.io/)
@@ -82,10 +88,16 @@
 //!
 //! ## Building
 //!
-//! The `pm_remez` crate uses [`ndarray_linalg`] to solve eigenvalue problems.
-//! This in turn depends on LAPACK. The `pm_remez` crate has several feature
-//! flags that are used to select the LAPACK backend. Exactly one of these
-//! features needs to be enabled to build `pm_remez`. The feature flags are
+//! The `pm_remez` crate supports different backends to solve eigenvalue
+//! problems. These are selected with feature flags. See [`EigenvalueBackend`]
+//! for more details. By default, only the faer backend is enabled, which is a
+//! pure Rust implementation.
+//!
+//! Another supported backend uses [`ndarray_linalg`] to solve eigenvalue
+//! problems with LAPACK. It is enabled with the `lapack-backend` feature flag.
+//! The `pm_remez` crate has several feature flags that are used to select the
+//! LAPACK backend. Exactly one of these features needs to be enabled to build
+//! `pm_remez` with the `lapack-backend` flag. The feature flags are
 //! `openblas-static`, `openblas-system`, `netlib-static`, `netlib-system`,
 //! `intel-mkl-static` and `intel-mkl-system`. The `-static` versions of each
 //! flag build the LAPACK backend and link statically against it. The `-system`
@@ -124,15 +136,27 @@ mod bands;
 use bands::*;
 mod barycentric;
 use barycentric::*;
+mod convf64;
+pub use convf64::Convf64;
 mod chebyshev;
 use chebyshev::compute_cheby_coefficients;
+mod eigenvalues;
+#[cfg(any(feature = "faer-backend", feature = "lapack-backend"))]
+pub use eigenvalues::DefaultEigenvalueBackend;
+pub use eigenvalues::EigenvalueBackend;
+#[cfg(feature = "faer-backend")]
+pub use eigenvalues::FaerBackend;
+#[cfg(feature = "lapack-backend")]
+pub use eigenvalues::LapackBackend;
 pub mod error;
 use error::Result;
 mod extrema;
 use extrema::*;
 mod fir_types;
 use fir_types::*;
+#[cfg(feature = "lapack-backend")]
 mod lapack;
+#[cfg(feature = "lapack-backend")]
 pub use lapack::{IsLapack, ToLapack};
 pub mod order_estimates;
 #[cfg(feature = "python")]
@@ -150,23 +174,43 @@ pub use types::{Band, DesignParameters, PMDesign, PMParameters, ParametersBuilde
 /// parameters given in the `parameters` argument.
 ///
 /// The type parameter `T` represents the scalar used internally in all the
-/// computations (except when using LAPACK to solve an eigenvalue problem, for
-/// which the [`ToLapack`] implementation of `T` is used to convert `T` to a
-/// LAPACK-compatible scalar type).
+/// computations, except potentially when doing eigenvalue calculations.
 ///
 /// The type parameter `P` represents the type of the Parks-McClellan design
 /// parameters. It needs to implement the [`DesignParameters`] trait. The
 /// `pm_remez` function uses the methods defined by this trait to obtain the
 /// parameters that it needs.
 ///
+/// This function uses the [`DefaultEigenvalueBackend`] to compute
+/// eigenvalues. The backend that is selected as default backend depends on the
+/// feature flags. Use [`pm_remez_with_backend`] to specify a particular
+/// eigenvalue backend.
+///
 /// # Examples
 ///
 /// See the [crate-level examples](crate#examples) for examples about how to use
 /// this function in each of the two coding styles provided by this crate.
+#[cfg(any(feature = "lapack-backend", feature = "faer-backend"))]
 pub fn pm_remez<T, P>(parameters: &P) -> Result<PMDesign<T>>
 where
-    T: Float + FloatConst + ToLapack,
+    T: Float + FloatConst,
     P: DesignParameters<T>,
+    DefaultEigenvalueBackend: EigenvalueBackend<T>,
+{
+    pm_remez_with_backend(parameters, &DefaultEigenvalueBackend::default())
+}
+
+/// Parks-McClellan Remez exchange algorithm with eigenvalue backend.
+///
+/// This function behaves like [`pm_remez`], but it additionally allows an
+/// eigenvalue backend to be specified. The eigenvalue backend must support the
+/// scalar type `T` that is used. See the [`EigenvalueBackend`] trait for more
+/// details.
+pub fn pm_remez_with_backend<T, P, B>(parameters: &P, eigenvalue_backend: &B) -> Result<PMDesign<T>>
+where
+    T: Float + FloatConst,
+    P: DesignParameters<T>,
+    B: EigenvalueBackend<T>,
 {
     let bands = parameters.bands();
     check_bands(bands)?;
@@ -257,6 +301,7 @@ where
                 &yk,
                 &desired,
                 &weights,
+                eigenvalue_backend,
             )?);
         }
 
