@@ -196,7 +196,11 @@ pub use types::{Band, DesignParameters, PMDesign, PMParameters, ParametersBuilde
 ///
 /// See the [crate-level examples](crate#examples) for examples about how to use
 /// this function in each of the two coding styles provided by this crate.
-#[cfg(any(feature = "lapack-backend", feature = "faer-backend"))]
+#[cfg(any(
+    feature = "lapack-backend",
+    feature = "faer-backend",
+    feature = "nalgebra-backend"
+))]
 pub fn pm_remez<T, P>(parameters: &P) -> Result<PMDesign<T>>
 where
     T: Float + FloatConst,
