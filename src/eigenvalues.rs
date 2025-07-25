@@ -46,9 +46,11 @@ impl From<EigenvaluesError> for Error {
 /// Default eigenvalue backend.
 ///
 /// This defines the default eigenvalue backend, which depends on what feature
-/// flags are enabled. If `lapack-backend` is enabled, then the default
-/// eigenvalue backend is the LAPACK backend. Otherwise, if `faer-backend` is
-/// enabled, the default eigenvalue backend is the faer backend.
+/// flags are enabled. The selected default backend is the first available from this priority list:
+///
+/// - `lapack-backend`
+/// - `faer-backend`
+/// - `nalgebra-backend`
 #[cfg(feature = "lapack-backend")]
 pub type DefaultEigenvalueBackend = lapack::LapackBackend;
 
@@ -56,11 +58,28 @@ pub type DefaultEigenvalueBackend = lapack::LapackBackend;
 /// Default eigenvalue backend.
 ///
 /// This defines the default eigenvalue backend, which depends on what feature
-/// flags are enabled. If `lapack-backend` is enabled, then the default
-/// eigenvalue backend is the LAPACK backend. Otherwise, if `faer-backend` is
-/// enabled, the default eigenvalue backend is the faer backend.
+/// flags are enabled. The selected default backend is the first available from this priority list:
+///
+/// - `lapack-backend`
+/// - `faer-backend`
+/// - `nalgebra-backend`
 #[cfg(all(not(feature = "lapack-backend"), feature = "faer-backend"))]
 pub type DefaultEigenvalueBackend = faer::FaerBackend;
+
+// TODO: avoid the copy & paste of this comment
+/// Default eigenvalue backend.
+///
+/// This defines the default eigenvalue backend, which depends on what feature
+/// flags are enabled. The selected default backend is the first available from this priority list:
+///
+/// - `lapack-backend`
+/// - `faer-backend`
+/// - `nalgebra-backend`
+#[cfg(all(
+    not(any(feature = "lapack-backend", feature = "faer-backend")),
+    feature = "nalgebra-backend"
+))]
+pub type DefaultEigenvalueBackend = nalgebra::NalgebraBackend;
 
 #[cfg(feature = "lapack-backend")]
 pub use lapack::LapackBackend;
@@ -184,6 +203,77 @@ mod faer {
             match value {
                 EvdError::NoConvergence => EigenvaluesError("no convergence".to_string()),
             }
+        }
+    }
+}
+
+#[cfg(feature = "nalgebra-backend")]
+pub use nalgebra::NalgebraBackend;
+
+#[cfg(feature = "nalgebra-backend")]
+mod nalgebra {
+    use super::*;
+    use ::nalgebra::{DMatrix, RealField};
+
+    /// nalgebra eigenvalue backend.
+    ///
+    /// This is an eigenvalue backend that uses [`nalgebra`](::faer) to compute
+    /// eigenvalues. For types natively supported by `nalgebra`, which are only
+    /// `f32` and `f64`, the calculations are done using that type. With
+    /// [`num_bigfloat::BigFloat`] the type is converted first to `f64`.
+    #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash, Default)]
+    pub struct NalgebraBackend {}
+
+    /// Marker trait used to mark for which types `T` that have the trait
+    /// [`RealField`](RealField), the trait `EigenvalueBacked<T>` should be
+    /// implemented for `NalgebraBackend` by doing no scalar type conversion and
+    /// using the type `T` natively in [`nalgebra`].
+    ///
+    /// A marker trait is needed because since `RealField` is defined by an
+    /// upstream crate, because if a blanket implementation
+    ///
+    /// ```ignore
+    /// impl<T: RealField> EigenvalueBackend<T> for NalgebraBackend { ... }
+    /// ```
+    ///
+    /// was used, then it would not be possible to do specialized
+    /// implementations for types `T` that do not implement `RealField` (because
+    /// at any point the upstream crate could add an implementation of
+    /// `RealField` for these types).
+    pub trait IsRealField: RealField {}
+    impl IsRealField for f64 {}
+    impl IsRealField for f32 {}
+
+    impl<T: IsRealField> EigenvalueBackend<T> for NalgebraBackend {
+        fn eigenvalues(&self, matrix: Array2<T>) -> Result<Vec<Complex<T>>> {
+            let matrix = DMatrix::from_row_iterator(matrix.nrows(), matrix.ncols(), matrix);
+            let eig = matrix.complex_eigenvalues();
+            Ok(eig.into_iter().cloned().collect())
+        }
+    }
+
+    #[cfg(feature = "num-bigfloat")]
+    impl EigenvalueBackend<num_bigfloat::BigFloat> for NalgebraBackend {
+        fn eigenvalues(
+            &self,
+            matrix: Array2<num_bigfloat::BigFloat>,
+        ) -> Result<Vec<Complex<num_bigfloat::BigFloat>>> {
+            // convert to f64 nalgebra matrix
+            let matrix = DMatrix::from_row_iterator(
+                matrix.nrows(),
+                matrix.ncols(),
+                matrix.into_iter().map(|x| x.to_f64()),
+            );
+            let eig = matrix.complex_eigenvalues();
+            Ok(eig
+                .into_iter()
+                .map(|z| {
+                    Complex::new(
+                        num_bigfloat::BigFloat::from_f64(z.re),
+                        num_bigfloat::BigFloat::from_f64(z.im),
+                    )
+                })
+                .collect())
         }
     }
 }

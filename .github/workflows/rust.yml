@@ -25,6 +25,7 @@ jobs:
                  "lapack-backend,intel-mkl-system",
                  ""]
         faer: [faer-backend, ""]
+        nalgebra: [nalgebra-backend, ""]
         
     runs-on: ubuntu-latest
     steps:
@@ -47,15 +48,15 @@ jobs:
     - name: Format
       run: cargo fmt --all -- --check
     - name: Clippy
-      run: cargo clippy --all-targets --features ${{matrix.lapack}},${{matrix.faer}}, --no-default-features -- -D warnings
+      run: cargo clippy --all-targets --features ${{matrix.lapack}},${{matrix.faer}},${{matrix.nalgebra}}, --no-default-features -- -D warnings
     - name: Doc
       # lapack-backend and num-bigfloat are needed to build docs, since otherwise there
       # are warnings due to missing references to these crates
       run: RUSTDOCFLAGS="-D warnings" cargo doc --features lapack-backend,num-bigfloat
     - name: Build
-      run: cargo build --verbose --features ${{matrix.lapack}},${{matrix.faer}}, --no-default-features
+      run: cargo build --verbose --features ${{matrix.lapack}},${{matrix.faer}},${{matrix.nalgebra}}, --no-default-features
     - name: Run tests
-      run: cargo test --verbose --features ${{matrix.lapack}},${{matrix.faer}}, --no-default-features
+      run: cargo test --verbose --features ${{matrix.lapack}},${{matrix.faer}},${{matrix.nalgebra}}, --no-default-features
 
   publish:
     name: Publish to crates.io
