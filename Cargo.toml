@@ -22,6 +22,8 @@ default = ["faer-backend"]
 lapack-backend = ["dep:ndarray-linalg"]
 # faer eigenvalue backend
 faer-backend = ["dep:faer", "dep:faer-ext"]
+# nalgebra eigenvalue backend
+nalgebra-backend = ["dep:nalgebra"]
 
 # LAPACK backend features forwarded to ndarray-linalg
 openblas-static = ["lapack-backend", "ndarray-linalg/openblas-static"]
@@ -37,6 +39,7 @@ python = ["pyo3"]
 faer = { version = "0.22.6", optional = true }
 faer-ext = { version = "0.6.0", features = ["ndarray"], optional = true }
 itertools = "0.14"
+nalgebra = { version = "0.33.2", optional = true }
 ndarray = "0.16"
 ndarray-linalg = { version = "0.17", default-features = false, optional = true }
 num = "0.4.3"

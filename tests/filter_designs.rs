@@ -19,6 +19,9 @@ use pm_remez::LapackBackend;
 #[cfg(feature = "faer-backend")]
 use pm_remez::FaerBackend;
 
+#[cfg(feature = "nalgebra-backend")]
+use pm_remez::NalgebraBackend;
+
 #[cfg(feature = "num-bigfloat")]
 use num_bigfloat::BigFloat;
 #[cfg(feature = "num-bigfloat")]
@@ -155,6 +158,12 @@ fn lowpass_faer() {
     lowpass(&FaerBackend::default());
 }
 
+#[cfg(feature = "nalgebra-backend")]
+#[test]
+fn lowpass_nalgebra() {
+    lowpass(&NalgebraBackend::default());
+}
+
 fn lowpass_stopband_weight<B: EigenvalueBackend<f64>>(eigenvalue_backend: &B) {
     let mut response_calculator = FirResponseCalculator::new(4096);
     let tolerance = 1e-10;
@@ -185,6 +194,12 @@ fn lowpass_stopband_weight_faer() {
     lowpass_stopband_weight(&FaerBackend::default());
 }
 
+#[cfg(feature = "nalgebra-backend")]
+#[test]
+fn lowpass_stopband_weight_nalgebra() {
+    lowpass_stopband_weight(&NalgebraBackend::default());
+}
+
 fn lowpass_one_over_f<B: EigenvalueBackend<f64>>(eigenvalue_backend: &B) {
     let mut response_calculator = FirResponseCalculator::new(4096);
     let tolerance = 1e-10;
@@ -213,6 +228,12 @@ fn lowpass_one_over_f_lapack() {
 #[test]
 fn lowpass_one_over_f_faer() {
     lowpass_one_over_f(&FaerBackend::default());
+}
+
+#[cfg(feature = "nalgebra-backend")]
+#[test]
+fn lowpass_one_over_f_nalgebra() {
+    lowpass_one_over_f(&NalgebraBackend::default());
 }
 
 #[cfg(feature = "num-bigfloat")]
@@ -251,6 +272,12 @@ fn lowpass_bigfloat_lapack() {
 #[test]
 fn lowpass_bigfloat_faer() {
     lowpass_bigfloat(&FaerBackend::default());
+}
+
+#[cfg(all(feature = "num-bigfloat", feature = "nalgebra-backend"))]
+#[test]
+fn lowpass_bigfloat_nalgebra() {
+    lowpass_bigfloat(&NalgebraBackend::default());
 }
 
 fn polyphase_filterbank<B: EigenvalueBackend<f64>>(eigenvalue_backend: &B) {
@@ -295,6 +322,12 @@ fn polyphase_filterbank_faer() {
     polyphase_filterbank(&FaerBackend::default());
 }
 
+#[cfg(feature = "nalgebra-backend")]
+#[test]
+fn polyphase_filterbank_nalgebra() {
+    polyphase_filterbank(&NalgebraBackend::default());
+}
+
 fn bandpass<B: EigenvalueBackend<f64>>(eigenvalue_backend: &B) {
     let bands = [
         BandSetting::new(0.0, 0.075, constant(0.0)).unwrap(),
@@ -334,6 +367,12 @@ fn bandpass_lapack() {
 #[test]
 fn bandpass_faer() {
     bandpass(&FaerBackend::default());
+}
+
+#[cfg(feature = "nalgebra-backend")]
+#[test]
+fn bandpass_nalgebra() {
+    bandpass(&NalgebraBackend::default());
 }
 
 fn design_cic_compensation<B: EigenvalueBackend<f64>>(
@@ -416,6 +455,12 @@ fn cic_compensation_faer() {
     cic_compensation(&FaerBackend::default());
 }
 
+#[cfg(feature = "nalgebra-backend")]
+#[test]
+fn cic_compensation_nalgebra() {
+    cic_compensation(&NalgebraBackend::default());
+}
+
 fn design_hilbert<B: EigenvalueBackend<f64>>(
     transition_bandwidth: f64,
     numtaps: usize,
@@ -468,6 +513,12 @@ fn hilbert_faer() {
     hilbert(&FaerBackend::default());
 }
 
+#[cfg(feature = "nalgebra-backend")]
+#[test]
+fn hilbert_nalgebra() {
+    hilbert(&NalgebraBackend::default());
+}
+
 fn design_differentiator<B: EigenvalueBackend<f64>>(
     transition_bandwidth: f64,
     numtaps: usize,
@@ -516,4 +567,10 @@ fn differentiator_lapack() {
 #[test]
 fn differentiator_faer() {
     differentiator(&FaerBackend::default());
+}
+
+#[cfg(feature = "nalgebra-backend")]
+#[test]
+fn differentiator_nalgebra() {
+    differentiator(&NalgebraBackend::default());
 }

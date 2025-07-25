@@ -35,7 +35,7 @@
 //! `linear` or `function`.
 //!
 //! ```
-//! # #[cfg(any(feature = "lapack-backend", feature = "faer-backend"))]
+//! # #[cfg(any(feature = "lapack-backend", feature = "faer-backend", feature = "nalgebra-backend"))]
 //! # fn main() -> Result<(), pm_remez::error::Error> {
 //! use pm_remez::{
 //!     constant, pm_parameters, pm_remez,
@@ -50,7 +50,7 @@
 //! let design = pm_remez(&parameters)?;
 //! # Ok(())
 //! # }
-//! # #[cfg(not(any(feature = "lapack-backend", feature = "faer-backend")))]
+//! # #[cfg(not(any(feature = "lapack-backend", feature = "faer-backend", feature = "nalgebra-backend")))]
 //! # fn main() {}
 //! ```
 //!
@@ -64,7 +64,7 @@
 //! This designs the same lowpass filter using this second coding style.
 //!
 //! ```
-//! # #[cfg(any(feature = "lapack-backend", feature = "faer-backend"))]
+//! # #[cfg(any(feature = "lapack-backend", feature = "faer-backend", feature = "nalgebra-backend"))]
 //! # fn main() -> Result<(), pm_remez::error::Error> {
 //! use pm_remez::{pm_remez, Band, BandSetting, PMParameters};
 //! let num_taps = 35;
@@ -77,7 +77,7 @@
 //! let design = pm_remez(&parameters)?;
 //! # Ok(())
 //! # }
-//! # #[cfg(not(any(feature = "lapack-backend", feature = "faer-backend")))]
+//! # #[cfg(not(any(feature = "lapack-backend", feature = "faer-backend", feature = "nalgebra-backend")))]
 //! # fn main() {}
 //! ```
 //!
@@ -141,13 +141,19 @@ pub use convf64::Convf64;
 mod chebyshev;
 use chebyshev::compute_cheby_coefficients;
 mod eigenvalues;
-#[cfg(any(feature = "faer-backend", feature = "lapack-backend"))]
+#[cfg(any(
+    feature = "faer-backend",
+    feature = "lapack-backend",
+    feature = "nalgebra-backend"
+))]
 pub use eigenvalues::DefaultEigenvalueBackend;
 pub use eigenvalues::EigenvalueBackend;
 #[cfg(feature = "faer-backend")]
 pub use eigenvalues::FaerBackend;
 #[cfg(feature = "lapack-backend")]
 pub use eigenvalues::LapackBackend;
+#[cfg(feature = "nalgebra-backend")]
+pub use eigenvalues::NalgebraBackend;
 pub mod error;
 use error::Result;
 mod extrema;
