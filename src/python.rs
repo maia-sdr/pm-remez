@@ -1,8 +1,9 @@
 use crate::{
-    BandSetting, ParametersBuilder, Setting, Symmetry, constant, error::Error, function, linear,
-    pm_parameters,
+    BandSetting, Convf64, DefaultEigenvalueBackend, EigenvalueBackend, ParametersBuilder, Setting,
+    Symmetry, constant, error::Error, function, linear, pm_parameters,
 };
 use num_bigfloat::BigFloat;
+use num_traits::{Float, FloatConst};
 use pyo3::{
     exceptions::{PyRuntimeError, PyValueError},
     prelude::*,
@@ -635,7 +636,7 @@ fn remez(
     }
 }
 
-fn remez_impl<T: F64Conversion>(
+fn remez_impl<T>(
     numtaps: usize,
     bands: Vec<f64>,
     desired: Vec<Bound<'_, PyAny>>,
@@ -643,7 +644,11 @@ fn remez_impl<T: F64Conversion>(
     symmetry: Symmetry,
     maxiter: usize,
     fs: f64,
-) -> PyResult<PMDesign> {
+) -> PyResult<PMDesign>
+where
+    T: Convf64 + Float + FloatConst,
+    DefaultEigenvalueBackend: EigenvalueBackend<T>,
+{
     let mut settings = Vec::with_capacity(desired.len());
     let bands = bands.chunks_exact(2);
     for (j, (band, des)) in bands.zip(&desired).enumerate() {
@@ -706,21 +711,21 @@ impl PMDesign {
 }
 
 impl PMDesign {
-    fn from_design<T: F64Conversion>(design: crate::PMDesign<T>, fs: f64) -> PMDesign {
+    fn from_design<T: Convf64>(design: crate::PMDesign<T>, fs: f64) -> PMDesign {
         PMDesign(crate::PMDesign {
             impulse_response: design
                 .impulse_response
                 .into_iter()
-                .map(|x| F64Conversion::to_f64(&x))
+                .map(|x| Convf64::to_f64(&x))
                 .collect(),
-            weighted_error: F64Conversion::to_f64(&design.weighted_error),
+            weighted_error: Convf64::to_f64(&design.weighted_error),
             extremal_freqs: design
                 .extremal_freqs
                 .into_iter()
-                .map(|x| F64Conversion::to_f64(&x) * fs)
+                .map(|x| Convf64::to_f64(&x) * fs)
                 .collect(),
             num_iterations: design.num_iterations,
-            flatness: F64Conversion::to_f64(&design.flatness),
+            flatness: Convf64::to_f64(&design.flatness),
         })
     }
 }
@@ -740,7 +745,7 @@ impl From<Error> for PyErr {
     }
 }
 
-fn pyany_to_setting<T: F64Conversion>(
+fn pyany_to_setting<T: Convf64 + Float>(
     obj: &Bound<'_, PyAny>,
     thing: &str,
     fs: f64,
@@ -758,7 +763,7 @@ fn pyany_to_setting<T: F64Conversion>(
     } else if obj.is_callable() {
         let obj = obj.clone().unbind();
         Ok(function(Box::new(move |x: T| {
-            let x = F64Conversion::to_f64(&x) * fs;
+            let x = Convf64::to_f64(&x) * fs;
             let ret = Python::with_gil(|py| {
                 let ret = obj
                     .call1(py, (x,))
@@ -766,7 +771,7 @@ fn pyany_to_setting<T: F64Conversion>(
                 ret.extract::<f64>(py)
                     .expect("Python callable did not return a float")
             });
-            F64Conversion::from_f64(ret)
+            Convf64::from_f64(ret)
         })))
     } else {
         Err(PyValueError::new_err(format!(
@@ -775,29 +780,6 @@ fn pyany_to_setting<T: F64Conversion>(
              indicating a linear function, or a callable, indicating an \
              arbitrary function to be evaluated"
         )))
-    }
-}
-
-trait F64Conversion: num_traits::Float + num_traits::FloatConst + crate::ToLapack + Sized {
-    fn from_f64(x: f64) -> Self;
-    fn to_f64(&self) -> f64;
-}
-
-impl F64Conversion for f64 {
-    fn from_f64(x: f64) -> f64 {
-        x
-    }
-    fn to_f64(&self) -> f64 {
-        *self
-    }
-}
-
-impl F64Conversion for BigFloat {
-    fn from_f64(x: f64) -> BigFloat {
-        BigFloat::from_f64(x)
-    }
-    fn to_f64(&self) -> f64 {
-        self.to_f64()
     }
 }
 
