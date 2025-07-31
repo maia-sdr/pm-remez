@@ -165,16 +165,25 @@ pub use types::{Band, DesignParameters, PMDesign, PMParameters, ParametersBuilde
 /// this function in each of the two coding styles provided by this crate.
 pub fn pm_remez<T, P>(parameters: &P) -> Result<PMDesign<T>>
 where
-    T: Float + FloatConst + ToLapack,
+    T: Float + FloatConst + ToLapack + std::fmt::Debug,
     P: DesignParameters<T>,
 {
     let bands = parameters.bands();
+    let bands_orig = bands;
     check_bands(bands)?;
     let mut bands = sort_bands(bands);
     let num_taps = parameters.num_taps();
     let odd_length = num_taps % 2 != 0;
     // Check that the frequency response is realizable by the requested FIR type.
     let desired_response = parameters.desired_response();
+    let desired_response = move |x| {
+        for band in bands_orig {
+            if band.contains(x) {
+                return desired_response(x);
+            }
+        }
+        panic!("no band contains {x:?} (bands = {bands_orig:?})");
+    };
     let symmetry = parameters.symmetry();
     check_response(&bands, &desired_response, symmetry, odd_length)?;
     // Adjust bands to avoid singularities.

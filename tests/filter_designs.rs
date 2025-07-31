@@ -46,7 +46,7 @@ impl FirResponseCalculator {
     }
 }
 
-fn design_antialias_lowpass<T: Float + FloatConst + ToLapack>(
+fn design_antialias_lowpass<T: Float + FloatConst + ToLapack + std::fmt::Debug>(
     decimation: usize,
     transition_bandwidth: T,
     numtaps: usize,
