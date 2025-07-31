@@ -10,16 +10,9 @@ build:
   os: ubuntu-24.04
   tools:
     python: "3.12"
-    # Currently readthedocs doesn't include Rust 1.85, so we install
-    # it below with asdf.
-    #
-    # rust: "latest"
+    rust: "latest"
   apt_packages:
     - gfortran
-  jobs:
-    pre_create_environment:
-      - asdf install rust 1.85.1
-      - asdf global rust 1.85.1
 
 # Build documentation in the "docs/" directory with Sphinx
 sphinx:
