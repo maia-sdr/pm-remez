@@ -1,6 +1,6 @@
 use crate::error::Error;
 use ndarray::Array2;
-use num::Complex;
+use num_complex::Complex;
 
 /// Eigenvalue backend.
 ///
