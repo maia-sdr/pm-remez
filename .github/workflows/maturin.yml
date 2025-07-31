@@ -29,24 +29,14 @@ jobs:
         platform:
           - runner: ubuntu-latest
             target: x86_64
-            openssl_install: yum install -y openssl-devel
-          # These are disabled. x86 build fails when building openblas, and
-          # the other targets needs cross-compilation of openblas.
-          # - runner: ubuntu-latest
-          #   target: x86
-          #   openssl_install: yum install -y openssl-devel
-          # - runner: ubuntu-latest
-          #   target: aarch64
-          #   openssl_install: apt-get update && apt-get install -y libssl-dev pkg-config
-          # - runner: ubuntu-latest
-          #   target: armv7
-          #   openssl_install: apt-get update && apt-get install -y libssl-dev pkg-config
-          # - runner: ubuntu-latest
-          #   target: s390x
-          #   openssl_install: apt-get update && apt-get install -y libssl-dev pkg-config
-          # - runner: ubuntu-latest
-          #   target: ppc64le
-          #   openssl_install: apt-get update && apt-get install -y libssl-dev pkg-config
+          - runner: ubuntu-latest
+            target: aarch64
+          - runner: ubuntu-latest
+            target: armv7
+          - runner: ubuntu-latest
+            target: s390x
+          - runner: ubuntu-latest
+            target: ppc64le
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -59,9 +49,9 @@ jobs:
           args: --release --out dist
           sccache: 'true'
           manylinux: auto
-          before-script-linux: ${{ matrix.platform.openssl_install }}
       - name: Install built wheel
         # also run an example filter design problem to check that things actually work
+        if: matrix.platform.target == 'x86_64'
         run: |
           pip install pm-remez --no-index --find-links dist --force-reinstall
           python -c "import pm_remez; print(pm_remez.remez(200, [0, 0.111875, 0.129375, 0.5], [1, 0], weight=[1, 1.0], bigfloat=False))"
@@ -70,7 +60,7 @@ jobs:
         with:
           name: wheels-linux-${{ matrix.platform.target }}
           path: dist
-          
+
   windows:
     runs-on: ${{ matrix.platform.runner }}
     strategy:
@@ -79,10 +69,8 @@ jobs:
         platform:
           - runner: windows-latest
             target: x64
-          # windows x86 gives a bunch of errors when linking liblax
-          # so it is disabled
-          # - runner: windows-latest
-          #   target: x86
+          - runner: windows-latest
+            target: x86
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -93,8 +81,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          # use intel-mkl-static when building on windows
-          args: --release --out dist --features intel-mkl-static,num-bigfloat,python
+          args: --release --out dist
           sccache: 'true'
       - name: Install built wheel
         # also run an example filter design problem to check that things actually work
@@ -113,10 +100,8 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-          # MacOS in x86_64 disabled for the time being because it is
-          # building a package that fails to run.
-          # - runner: macos-13
-          #   target: x86_64
+          - runner: macos-13
+            target: x86_64
           - runner: macos-14
             target: aarch64
     steps:
