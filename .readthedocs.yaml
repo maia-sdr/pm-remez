@@ -10,9 +10,16 @@ build:
   os: ubuntu-24.04
   tools:
     python: "3.12"
-    rust: "latest"
+    # The "latest" rust version of read the docs is usually
+    # quite old. We install the latest version with asdf below.
+    #
+    # rust: "latest"
   apt_packages:
     - gfortran
+  jobs:
+    pre_create_environment:
+      - asdf install rust latest
+      - asdf global rust latest
 
 # Build documentation in the "docs/" directory with Sphinx
 sphinx:
