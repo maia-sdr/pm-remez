@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [tool.maturin]
 bindings = "pyo3"
-features = ["num-bigfloat", "faer-backend", "python"]
+features = ["num-bigfloat", "nalgebra-backend", "python"]
 no-default-features = true
 
 [project]
