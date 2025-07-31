@@ -50,3 +50,6 @@ thiserror = "2"
 
 [dev-dependencies]
 rustfft = "6.2"
+
+[package.metadata.docs.rs]
+features = ["lapack-backend", "faer-backend", "nalgebra-backend", "num-bigfloat"]
