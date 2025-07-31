@@ -42,7 +42,7 @@ itertools = "0.14"
 nalgebra = { version = "0.33.2", optional = true }
 ndarray = "0.16"
 ndarray-linalg = { version = "0.17", default-features = false, optional = true }
-num = "0.4.3"
+num-complex = "0.4.3"
 num-bigfloat = { version = "1.7.1", optional = true }
 num-traits = "0.2"
 pyo3 = { version = "0.24", optional = true, features = ["abi3-py38", "extension-module"] }
