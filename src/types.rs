@@ -192,13 +192,23 @@ pub trait DesignParameters<T> {
     /// Returns the desired response.
     ///
     /// This function returns a closure that the Parks-McClellan algorithm
-    /// evaluates at points belonging to the bands listed by the `bands` method.
+    /// evaluates at points belonging to the bands listed by the `bands`
+    /// method. Due to numerical precision errors, the Parks-McClellan algorithm
+    /// may also try to evaluate this closure at points which are outside all of
+    /// these bands, but very close to one of the band endpoints. The closure
+    /// should handle this situation gracefully, returning an output that is
+    /// very close to that intended at the corresponding band endpoint.
     fn desired_response(&self) -> impl Fn(T) -> T;
 
     /// Returns the weight function.
     ///
     /// This function returns a closure that the Parks-McClellan algorithm
-    /// evaluates at points belonging to the bands listed by the `bands` method.
+    /// evaluates at points belonging to the bands listed by the `bands`
+    /// method. Due to numerical precision errors, the Parks-McClellan algorithm
+    /// may also try to evaluate this closure at points which are outside all of
+    /// these bands, but very close to one of the band endpoints. The closure
+    /// should handle this situation gracefully, returning an output that is
+    /// very close to that intended at the corresponding band endpoint.
     fn weights(&self) -> impl Fn(T) -> T;
 
     /// Returns the degree of the Chebyshev proxy that is used for Chebyshev
@@ -310,6 +320,13 @@ impl<T: Float, D, W> PMParameters<T, D, W> {
     /// [`ParametersBuilder`] trait. By default, the symmetry of the FIR filter
     /// taps is set to even, and the other parameters that can be changed by
     /// this trait are given reasonable default values.
+    ///
+    /// Due to numerical precision errors, the Parks-McClellan algorithm may try
+    /// to evaluate `desired_response` and `weights` at points which are outside
+    /// all of the bands specified in `bands`, but very close to one of the band
+    /// endpoints. The `desired_response` and `weights` functions should handle
+    /// this situation gracefully, and return an output that is very close to
+    /// that intended at the corresponding band endpoint.
     pub fn new(
         num_taps: usize,
         bands: Vec<Band<T>>,
