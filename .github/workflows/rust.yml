@@ -56,6 +56,10 @@ jobs:
     - name: Build
       run: cargo build --verbose --features ${{matrix.lapack}},${{matrix.faer}},${{matrix.nalgebra}}, --no-default-features
     - name: Run tests
+      env:
+        # Opt out of LLD when using intel-mkl. See https://github.com/rust-lang/rust/issues/147156
+        RUSTFLAGS: ${{ matrix.lapack == 'lapack-backend,intel-mkl-system' && '-Clinker-features=-lld' || '' }}
+        RUSTDOCFLAGS: ${{ matrix.lapack == 'lapack-backend,intel-mkl-system' && '-Clinker-features=-lld' || '' }}
       run: cargo test --verbose --features ${{matrix.lapack}},${{matrix.faer}},${{matrix.nalgebra}}, --no-default-features
 
   publish:
