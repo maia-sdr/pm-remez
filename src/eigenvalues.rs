@@ -2,6 +2,9 @@ use crate::error::Error;
 use ndarray::Array2;
 use num_complex::Complex;
 
+// This is needed because ndarray_linalg can be a broken link if the crate is
+// not being built due to selected feature flags.
+#[allow(rustdoc::broken_intra_doc_links)]
 /// Eigenvalue backend.
 ///
 /// This trait models a backend that performs the computation of the eigenvalues
@@ -12,7 +15,7 @@ use num_complex::Complex;
 /// with features flags. At the moment the following backends are supported:
 ///
 /// - `lapack-backend` feature flag. This defines the [`LapackBackend`] backend,
-///   which uses [`ndarray-linalg`] to compute eigenvalues with LAPACK.
+///   which uses [`ndarray_linalg`] to compute eigenvalues with LAPACK.
 ///
 /// - `faer-backend` feature flag. This defines the [`FaerBackend`] backend,
 ///   which uses [`faer`](::faer) to compute eigenvalues.
@@ -92,7 +95,7 @@ mod lapack {
 
     /// LAPACK eigenvalue backend.
     ///
-    /// This is an eigenvalue backend that uses [`ndarray-linalg`] to compute
+    /// This is an eigenvalue backend that uses [`ndarray_linalg`] to compute
     /// eigenvalues with LAPACK. For types natively supported by LAPACK, which
     /// are `f64` and `f32`, the calculations are done directly using that
     /// type. For other types, the [`ToLapack`] trait is used to convert the
@@ -132,6 +135,9 @@ mod faer {
     use ::faer::{linalg::evd::EvdError, traits::RealField};
     use faer_ext::IntoFaer;
 
+    // This is needed because num_bigfloat can be a broken link if the crate is
+    // not being built due to selected feature flags.
+    #[allow(rustdoc::broken_intra_doc_links)]
     /// faer eigenvalue backend.
     ///
     /// This is an eigenvalue backend that uses [`faer`](::faer) to compute

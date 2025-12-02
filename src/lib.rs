@@ -93,7 +93,7 @@
 //! for more details. By default, only the faer backend is enabled, which is a
 //! pure Rust implementation.
 //!
-//! Another supported backend uses [`ndarray_linalg`] to solve eigenvalue
+//! Another supported backend uses `ndarray_linalg` to solve eigenvalue
 //! problems with LAPACK. It is enabled with the `lapack-backend` feature flag.
 //! The `pm_remez` crate has several feature flags that are used to select the
 //! LAPACK backend. Exactly one of these features needs to be enabled to build

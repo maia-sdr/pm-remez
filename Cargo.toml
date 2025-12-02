@@ -1,6 +1,6 @@
 [package]
 name = "pm-remez"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2024"
 authors = ["Daniel Estevez <daniel@destevez.net>"]
 description = "Parks-McClellan Remez FIR design algorithm"
@@ -36,16 +36,18 @@ intel-mkl-system = ["lapack-backend", "ndarray-linalg/intel-mkl-system"]
 python = ["pyo3"]
 
 [dependencies]
-faer = { version = "0.22.6", optional = true }
-faer-ext = { version = "0.6.0", features = ["ndarray"], optional = true }
+faer = { version = "0.23", optional = true }
+faer-ext = { version = "0.7", features = ["ndarray"], optional = true }
 itertools = "0.14"
 nalgebra = { version = "0.34", optional = true }
+# ndarray needs to stay at 0.16 because faer-ext 0.7 does not support ndarray 0.17
 ndarray = "0.16"
+# ndarray-linalg needs to stay at 0.17 because 0.18 requires ndarray 0.17
 ndarray-linalg = { version = "0.17", default-features = false, optional = true }
 num-complex = "0.4.3"
 num-bigfloat = { version = "1.7.1", optional = true }
 num-traits = "0.2"
-pyo3 = { version = "0.26", optional = true, features = ["abi3-py38", "extension-module"] }
+pyo3 = { version = "0.27", optional = true, features = ["abi3-py38", "extension-module"] }
 thiserror = "2"
 
 [dev-dependencies]
