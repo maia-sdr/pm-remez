@@ -139,7 +139,7 @@ use barycentric::*;
 mod convf64;
 pub use convf64::Convf64;
 mod chebyshev;
-use chebyshev::compute_cheby_coefficients;
+use chebyshev::{chebyshev_nodes, compute_cheby_coefficients};
 mod eigenvalues;
 #[cfg(any(
     feature = "faer-backend",
@@ -264,8 +264,8 @@ where
     let mut num_iterations = 0;
     let mut flatness = T::zero();
     let max_iterations = parameters.max_iterations();
-    let cheby_proxy_m = parameters.chebyshev_proxy_degree();
     let flatness_threshold = parameters.flatness_threshold();
+    let cheby_nodes: Vec<T> = chebyshev_nodes(parameters.chebyshev_proxy_degree()).collect();
     for num_iter in 1..=max_iterations {
         num_iterations = num_iter;
         // Perform Remez exchange
@@ -294,13 +294,6 @@ where
             .into_iter()
         }));
 
-        // Compute Chebyshev nodes for [-1, 1] interval
-        let cheby_nodes: Vec<T> = {
-            let scale = T::PI() / T::from(cheby_proxy_m).unwrap();
-            (0..=cheby_proxy_m)
-                .map(|j| (T::from(j).unwrap() * scale).cos())
-                .collect()
-        };
         // Add local extrema inside each subinterval to the candidate list
         for interval in &subintervals {
             remez_candidates.extend(find_extrema_in_subinterval(
