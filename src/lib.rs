@@ -282,8 +282,17 @@ where
             })
             .collect();
         let subintervals = subdivide(&x, &bands_x);
-        // TODO: use with_capacity with an upper estimate
-        let mut remez_candidates: Vec<ExtremaCandidate<T>> = Vec::new();
+        // Upper estimate of capacity needed for remez_candidates vector. For
+        // each subinterval, we potentially need:
+        //
+        // * 2 points for the subinterval endpoints
+        //
+        // * parameters.chebyshev_proxy_degree() - 1 points for the roots of the
+        // derivative of the Chebyshev proxy
+        let upper_estimate_num_candidates =
+            subintervals.len() * (parameters.chebyshev_proxy_degree() + 1);
+        let mut remez_candidates: Vec<ExtremaCandidate<T>> =
+            Vec::with_capacity(upper_estimate_num_candidates);
 
         // Add subinterval endpoints to the candidate list
         remez_candidates.extend(subintervals.iter().flat_map(|interval| {
@@ -307,6 +316,10 @@ where
                 eigenvalue_backend,
             )?);
         }
+
+        // Check that the upper estimate of remez_candidates capacity was
+        // not too small
+        debug_assert!(remez_candidates.len() <= upper_estimate_num_candidates);
 
         // Sort candidates
         // unwrap will fail if there are NaN's in the x values
