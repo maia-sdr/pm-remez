@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-01-15
+
+### Changed
+
+- Updated dependencies.
+- Minor code improvements.
+- Changed default features from `faer-backend` to `nalgebra-backend` to match
+  the eigenvalue backend used in the Python package.
+
 ## [0.2.2] - 2025-12-02
 
 ### Changed
@@ -96,7 +105,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First release of pm-remez.
 
-[unreleased]: https://github.com/maia-sdr/pm-remez/compare/v0.2.2...HEAD
+[unreleased]: https://github.com/maia-sdr/pm-remez/compare/v0.2.3...HEAD
+[0.2.3]: https://github.com/maia-sdr/pm-remez/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/maia-sdr/pm-remez/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/maia-sdr/pm-remez/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/maia-sdr/pm-remez/compare/v0.1.8...v0.2.0

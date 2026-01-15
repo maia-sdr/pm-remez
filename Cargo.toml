@@ -1,6 +1,6 @@
 [package]
 name = "pm-remez"
-version = "0.2.2"
+version = "0.2.3"
 edition = "2024"
 authors = ["Daniel Estevez <daniel@destevez.net>"]
 description = "Parks-McClellan Remez FIR design algorithm"
