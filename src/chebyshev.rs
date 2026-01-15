@@ -65,3 +65,10 @@ fn halve_first_and_last<T: Float>(a: &mut [T]) {
     let x = a.last_mut().unwrap();
     *x = *x * scale;
 }
+
+// Compute Chebyshev nodes of the second kind for the [-1, 1] interval
+// (this returns n + 1 nodes)
+pub fn chebyshev_nodes<T: Float + FloatConst>(n: usize) -> impl Iterator<Item = T> {
+    let scale = T::PI() / T::from(n).unwrap();
+    (0..=n).map(move |j| (T::from(j).unwrap() * scale).cos())
+}
