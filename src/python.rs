@@ -1,3 +1,9 @@
+#![cfg(not(doctest))]
+
+// Do not run doctests, since otherwise Rust attempts to build the Python
+// examples as Rust code. There are no Rust doctests in this module, so the
+// easiest solution is to disable doctests.
+
 use crate::{
     BandSetting, Convf64, DefaultEigenvalueBackend, EigenvalueBackend, ParametersBuilder, Setting,
     Symmetry, constant, error::Error, function, linear, pm_parameters,
@@ -591,6 +597,7 @@ fn pm_remez(m: &Bound<'_, PyModule>) -> PyResult<()> {
 /// .. _num_bigfloat: https://docs.rs/num-bigfloat/latest/num_bigfloat/
 /// .. _Hilbert transform: https://en.wikipedia.org/wiki/Hilbert_transform
 /// .. _GNU Radio Hilbert block: https://wiki.gnuradio.org/index.php/Hilbert
+#[allow(clippy::too_many_arguments)]
 #[pyfunction]
 #[pyo3(signature = (numtaps, bands, desired, *, weight=None, symmetry="even", maxiter=100, fs=1.0, bigfloat=false))]
 fn remez(
@@ -603,7 +610,7 @@ fn remez(
     fs: f64,
     bigfloat: bool,
 ) -> PyResult<PMDesign> {
-    if bands.len() % 2 != 0 {
+    if !bands.len().is_multiple_of(2) {
         return Err(PyValueError::new_err(
             "the length of the bands argument must be even",
         ));
@@ -613,12 +620,12 @@ fn remez(
             "the length of the bands argument must be twice the length of the desired argument",
         ));
     }
-    if let Some(weight) = &weight {
-        if 2 * weight.len() != bands.len() {
-            return Err(PyValueError::new_err(
-                "the length of the bands argument must be twice the length of the weight argument",
-            ));
-        }
+    if let Some(weight) = &weight
+        && 2 * weight.len() != bands.len()
+    {
+        return Err(PyValueError::new_err(
+            "the length of the bands argument must be twice the length of the weight argument",
+        ));
     }
     let symmetry = match symmetry {
         "even" => Symmetry::Even,
@@ -764,7 +771,7 @@ fn pyany_to_setting<T: Convf64 + Float>(
         let obj = obj.clone().unbind();
         Ok(function(Box::new(move |x: T| {
             let x = Convf64::to_f64(&x) * fs;
-            let ret = Python::with_gil(|py| {
+            let ret = Python::attach(|py| {
                 let ret = obj
                     .call1(py, (x,))
                     .expect("Python callable returned an error");

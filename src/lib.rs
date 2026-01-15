@@ -165,7 +165,14 @@ mod lapack;
 #[cfg(feature = "lapack-backend")]
 pub use lapack::{IsLapack, ToLapack};
 pub mod order_estimates;
-#[cfg(feature = "python")]
+#[cfg(all(
+    feature = "python",
+    any(
+        feature = "faer-backend",
+        feature = "lapack-backend",
+        feature = "nalgebra-backend"
+    )
+))]
 mod python;
 mod requirements;
 pub use requirements::{BandSetting, Setting, constant, function, linear, pm_parameters};

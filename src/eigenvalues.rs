@@ -2,9 +2,6 @@ use crate::error::Error;
 use ndarray::Array2;
 use num_complex::Complex;
 
-// This is needed because ndarray_linalg can be a broken link if the crate is
-// not being built due to selected feature flags.
-#[allow(rustdoc::broken_intra_doc_links)]
 /// Eigenvalue backend.
 ///
 /// This trait models a backend that performs the computation of the eigenvalues
@@ -14,11 +11,14 @@ use num_complex::Complex;
 /// types that implement this trait. These libraries are optional and selected
 /// with features flags. At the moment the following backends are supported:
 ///
-/// - `lapack-backend` feature flag. This defines the [`LapackBackend`] backend,
-///   which uses [`ndarray_linalg`] to compute eigenvalues with LAPACK.
+/// - `lapack-backend` feature flag. This defines the `LapackBackend` backend,
+///   which uses `ndarray_linalg` to compute eigenvalues with LAPACK.
 ///
-/// - `faer-backend` feature flag. This defines the [`FaerBackend`] backend,
-///   which uses [`faer`](::faer) to compute eigenvalues.
+/// - `faer-backend` feature flag. This defines the `FaerBackend` backend,
+///   which uses `faer` to compute eigenvalues.
+///
+/// - `nalgebra-backend` feature flag. This defines the `NalgebraBackend`,
+///   which uses `nalgebra` to compute eigenvalues.
 pub trait EigenvalueBackend<T> {
     /// Computes the eigenvalues of a real square matrix with scalar type `T`.
     ///
@@ -67,18 +67,18 @@ macro_rules! default_eigenvalue_doc {
 
 #[doc = default_eigenvalue_doc!()]
 #[cfg(feature = "lapack-backend")]
-pub type DefaultEigenvalueBackend = lapack::LapackBackend;
+pub type DefaultEigenvalueBackend = LapackBackend;
 
 #[doc = default_eigenvalue_doc!()]
 #[cfg(all(not(feature = "lapack-backend"), feature = "faer-backend"))]
-pub type DefaultEigenvalueBackend = faer::FaerBackend;
+pub type DefaultEigenvalueBackend = FaerBackend;
 
 #[doc = default_eigenvalue_doc!()]
 #[cfg(all(
     not(any(feature = "lapack-backend", feature = "faer-backend")),
     feature = "nalgebra-backend"
 ))]
-pub type DefaultEigenvalueBackend = nalgebra::NalgebraBackend;
+pub type DefaultEigenvalueBackend = NalgebraBackend;
 
 #[cfg(feature = "lapack-backend")]
 pub use lapack::LapackBackend;
@@ -219,7 +219,7 @@ mod nalgebra {
 
     /// nalgebra eigenvalue backend.
     ///
-    /// This is an eigenvalue backend that uses [`nalgebra`](::faer) to compute
+    /// This is an eigenvalue backend that uses [`nalgebra`](::nalgebra) to compute
     /// eigenvalues. For types natively supported by `nalgebra`, which are only
     /// `f32` and `f64`, the calculations are done using that type. With
     /// [`num_bigfloat::BigFloat`] the type is converted first to `f64`.

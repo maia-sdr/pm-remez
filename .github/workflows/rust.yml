@@ -26,6 +26,7 @@ jobs:
                  ""]
         faer: [faer-backend, ""]
         nalgebra: [nalgebra-backend, ""]
+        python: [python, ""]
         
     runs-on: ubuntu-latest
     steps:
@@ -48,19 +49,19 @@ jobs:
     - name: Format
       run: cargo fmt --all -- --check
     - name: Clippy
-      run: cargo clippy --all-targets --features ${{matrix.lapack}},${{matrix.faer}},${{matrix.nalgebra}}, --no-default-features -- -D warnings
+      run: cargo clippy --all-targets --features ${{matrix.lapack}},${{matrix.faer}},${{matrix.nalgebra}},${{matrix.python}}, --no-default-features -- -D warnings
     - name: Doc
       # lapack-backend and num-bigfloat are needed to build docs, since otherwise there
       # are warnings due to missing references to these crates
       run: RUSTDOCFLAGS="-D warnings" cargo doc --features lapack-backend,num-bigfloat
     - name: Build
-      run: cargo build --verbose --features ${{matrix.lapack}},${{matrix.faer}},${{matrix.nalgebra}}, --no-default-features
+      run: cargo build --verbose --features ${{matrix.lapack}},${{matrix.faer}},${{matrix.nalgebra}},${{matrix.python}}, --no-default-features
     - name: Run tests
       env:
         # Opt out of LLD when using intel-mkl. See https://github.com/rust-lang/rust/issues/147156
         RUSTFLAGS: ${{ matrix.lapack == 'lapack-backend,intel-mkl-system' && '-Clinker-features=-lld' || '' }}
         RUSTDOCFLAGS: ${{ matrix.lapack == 'lapack-backend,intel-mkl-system' && '-Clinker-features=-lld' || '' }}
-      run: cargo test --verbose --features ${{matrix.lapack}},${{matrix.faer}},${{matrix.nalgebra}}, --no-default-features
+      run: cargo test --verbose --features ${{matrix.lapack}},${{matrix.faer}},${{matrix.nalgebra}},${{matrix.python}}, --no-default-features
 
   publish:
     name: Publish to crates.io

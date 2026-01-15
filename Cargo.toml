@@ -16,7 +16,7 @@ name = "pm_remez"
 crate-type = ["cdylib", "rlib"]
 
 [features]
-default = ["faer-backend"]
+default = ["nalgebra-backend"]
 
 # LAPACK eigenvalue backend using ndarray-linalg
 lapack-backend = ["dep:ndarray-linalg"]
@@ -33,7 +33,8 @@ netlib-system = ["lapack-backend", "ndarray-linalg/netlib-system"]
 intel-mkl-static = ["lapack-backend", "ndarray-linalg/intel-mkl-static"]
 intel-mkl-system = ["lapack-backend", "ndarray-linalg/intel-mkl-system"]
 
-python = ["pyo3"]
+# PyO3 bindings. Requires at least one of the eigenvalue backends to be enabled.
+python = ["pyo3", "num-bigfloat"]
 
 [dependencies]
 faer = { version = "0.23", optional = true }
