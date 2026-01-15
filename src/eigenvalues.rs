@@ -46,38 +46,34 @@ impl From<EigenvaluesError> for Error {
     }
 }
 
-/// Default eigenvalue backend.
-///
-/// This defines the default eigenvalue backend, which depends on what feature
-/// flags are enabled. The selected default backend is the first available from this priority list:
-///
-/// - `lapack-backend`
-/// - `faer-backend`
-/// - `nalgebra-backend`
+#[cfg(any(
+    feature = "lapack-backend",
+    feature = "faer-backend",
+    feature = "nalgebra-backend"
+))]
+macro_rules! default_eigenvalue_doc {
+    () => {
+        r#" Default eigenvalue backend.
+
+ This defines the default eigenvalue backend, which depends on what feature
+ flags are enabled. The selected default backend is the first available from this priority list:
+
+ - `lapack-backend`
+ - `faer-backend`
+ - `nalgebra-backend`
+"#
+    };
+}
+
+#[doc = default_eigenvalue_doc!()]
 #[cfg(feature = "lapack-backend")]
 pub type DefaultEigenvalueBackend = lapack::LapackBackend;
 
-// TODO: avoid the copy & paste of this comment
-/// Default eigenvalue backend.
-///
-/// This defines the default eigenvalue backend, which depends on what feature
-/// flags are enabled. The selected default backend is the first available from this priority list:
-///
-/// - `lapack-backend`
-/// - `faer-backend`
-/// - `nalgebra-backend`
+#[doc = default_eigenvalue_doc!()]
 #[cfg(all(not(feature = "lapack-backend"), feature = "faer-backend"))]
 pub type DefaultEigenvalueBackend = faer::FaerBackend;
 
-// TODO: avoid the copy & paste of this comment
-/// Default eigenvalue backend.
-///
-/// This defines the default eigenvalue backend, which depends on what feature
-/// flags are enabled. The selected default backend is the first available from this priority list:
-///
-/// - `lapack-backend`
-/// - `faer-backend`
-/// - `nalgebra-backend`
+#[doc = default_eigenvalue_doc!()]
 #[cfg(all(
     not(any(feature = "lapack-backend", feature = "faer-backend")),
     feature = "nalgebra-backend"
