@@ -191,9 +191,6 @@ where
 
     // Filter only the roots that are real and inside [-1, 1]. Map them to
     // the original interval.
-    //
-    // The threshold scalar is real, but the type system doesn't know, so we
-    // need to call re.
     let threshold = T::from(1e-20).unwrap();
     let limits = -T::one()..=T::one();
     let scale = T::from(0.5).unwrap() * (interval.end - interval.begin);
