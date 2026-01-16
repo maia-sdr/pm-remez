@@ -218,7 +218,7 @@ fn pm_remez(m: &Bound<'_, PyModule>) -> PyResult<()> {
 /// been quantized to fixed point. The way to design this kind of filter is by
 /// using a linear slope function as the stopband weight. This is enabled by
 /// setting `one_over_f=True` in this example function. Here we design a
-/// decimate by 4 filter to illustrate the `1/f` decay bettery.
+/// decimate by 4 filter to illustrate the `1/f` decay better.
 ///
 /// >>> design_antialias_lowpass(4, 0.2, 67, stopband_weight=10, one_over_f=True)
 /// >>> plt.show()
@@ -226,7 +226,7 @@ fn pm_remez(m: &Bound<'_, PyModule>) -> PyResult<()> {
 /// A filter with a large number of taps is able to achieve a narrow transition
 /// bandwidth with good stopband attenuation, and this is usually the reason why
 /// a larger number of taps might be required in a filter. However, if a filter
-/// with many taps is designed for a resonably large transition bandwidth, it is
+/// with many taps is designed for a reasonably large transition bandwidth, it is
 /// able to achieve a very large stopband attenuation and passband
 /// flatness. This makes the numerical problem ill-conditioned. pm-remez can
 /// use the `num_bigfloat`_ library to solve this kinds of problems. For
@@ -361,7 +361,7 @@ fn pm_remez(m: &Bound<'_, PyModule>) -> PyResult<()> {
 /// >>>         cic_taps = np.convolve(cic_taps, np.ones(cic_decimation))
 /// >>>     cic_taps /= np.sum(cic_taps)
 /// >>>
-/// >>>     # Compute taps of the combination of CIC filter + Compenstation FIR
+/// >>>     # Compute taps of the combination of CIC filter + Compensation FIR
 /// >>>     fir_taps_zero_packed = np.zeros((numtaps, cic_decimation))
 /// >>>     fir_taps_zero_packed[:, 0] = design.impulse_response
 /// >>>     fir_taps_zero_packed = fir_taps_zero_packed.ravel()
@@ -452,7 +452,7 @@ fn pm_remez(m: &Bound<'_, PyModule>) -> PyResult<()> {
 /// frequency of the signal is positive or negative respectively.
 ///
 /// Such an ideal Hilbert filter cannot be realized as an FIR filter, because the
-/// frequency response is not continous among other reasons. FIR filters with
+/// frequency response is not continuous among other reasons. FIR filters with
 /// real coefficients, odd symmetry, and an odd number of taps have a frequency
 /// response which is a purely imaginary odd function. Therefore, an all-pass
 /// FIR filter with those properties that has an amplitude response close to one
@@ -588,7 +588,7 @@ fn pm_remez(m: &Bound<'_, PyModule>) -> PyResult<()> {
 /// >>>     plt.subplots_adjust(hspace=0.1)
 /// >>>     return design
 ///
-/// Here is a differentiator filter with a transition banwdith of 10%. The gain
+/// Here is a differentiator filter with a transition bandwidth of 10%. The gain
 /// error ripple can be decreased by increasing the number of taps.
 ///
 /// >>> des = design_differentiator(0.1, 43)
