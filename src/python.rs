@@ -312,7 +312,7 @@ fn pm_remez(m: &Bound<'_, PyModule>) -> PyResult<()> {
 ///
 /// On its own, a CIC filter is not so good as an anti-alias filter. The
 /// passband is far from flat, and the stopband attenuation is not high enough.
-/// For this reason, a CIC is usually followed by a FIR decimator with a small
+/// For this reason, a CIC is usually followed by an FIR decimator with a small
 /// decimation factor such as 2, 3, or 4. The FIR decimator limits the part of
 /// the passband that is used to the flatter central region and attenuates the
 /// regions of the spectrum where the CIC stopband is worst.
@@ -355,7 +355,7 @@ fn pm_remez(m: &Bound<'_, PyModule>) -> PyResult<()> {
 /// >>>     axs[0].plot(w, 20*np.log10(np.abs(h)), label='Compensation FIR')
 /// >>>     axs[0].set_ylim((-80, 5))
 /// >>>
-/// >>>     # Compute taps of the CIC filter (understood as a FIR filter)
+/// >>>     # Compute taps of the CIC filter (understood as an FIR filter)
 /// >>>     cic_taps = np.ones(1)
 /// >>>     for _ in range(cic_stages):
 /// >>>         cic_taps = np.convolve(cic_taps, np.ones(cic_decimation))
@@ -444,14 +444,14 @@ fn pm_remez(m: &Bound<'_, PyModule>) -> PyResult<()> {
 /// Different sources in the signal processing literature use the term Hilbert
 /// filter to refer to different, but related, types of FIR filters. Some
 /// sources (including most sources which speak of Hilbert filters in the
-/// context of the Parks-McClellan algorithm) call Hilbert filter to a FIR
+/// context of the Parks-McClellan algorithm) call Hilbert filter to an FIR
 /// filter that tries to approximate the `Hilbert transform`_. The frequency
 /// response of such an ideal Hilbert filter is :math:`-i` for :math:`f > 0` and
 /// :math:`i` for :math:`f < 0`. Therefore, the filter shifts the phase of a
 /// signal backwards or forwards by 90 degrees according to whether the
 /// frequency of the signal is positive or negative respectively.
 ///
-/// Such an ideal Hilbert filter cannot be realized as a FIR filter, because the
+/// Such an ideal Hilbert filter cannot be realized as an FIR filter, because the
 /// frequency response is not continous among other reasons. FIR filters with
 /// real coefficients, odd symmetry, and an odd number of taps have a frequency
 /// response which is a purely imaginary odd function. Therefore, an all-pass
@@ -474,7 +474,7 @@ fn pm_remez(m: &Bound<'_, PyModule>) -> PyResult<()> {
 /// The Hilbert transform and the Riesz projection are closely related. If we
 /// denote by :math:`H` the Hilbert transform and by :math:`P` the Riesz
 /// projection, we see that :math:`P = (I + iH) / 2`, where :math:`I` denotes
-/// the identity transformation. A FIR filter with complex-valued taps that
+/// the identity transformation. An FIR filter with complex-valued taps that
 /// approximates the Riesz projection can be built from such a Hilbert FIR
 /// filter by setting the imaginary part of the taps to one half of the values
 /// of the Hilbert FIR filter taps, and the real part of the taps to zero except
@@ -484,7 +484,7 @@ fn pm_remez(m: &Bound<'_, PyModule>) -> PyResult<()> {
 /// :py:func:`scipy.signal.remez`, Hilbert filters are treated as a special type
 /// of filter. In pm-remez, Hilbert filters are not a special case. They are
 /// designed as filters with an odd number of taps, and with odd symmetry, by
-/// using the parameter ``symmetry = 'odd'``. Since such a FIR filter must have
+/// using the parameter ``symmetry = 'odd'``. Since such an FIR filter must have
 /// a frequency response of zero at DC and at the Nyquist frequency, the desired
 /// response needs to be set to zero at these frequencies. The filter is
 /// designed as an all-pass filter that has a band covering almost from DC to
