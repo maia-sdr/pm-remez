@@ -674,7 +674,7 @@ where
 }
 
 #[derive(Debug, Clone)]
-#[pyclass]
+#[pyclass(skip_from_py_object)]
 struct PMDesign(crate::PMDesign<f64>);
 
 #[pymethods]
