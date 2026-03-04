@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-03-04
+
+### Changed
+
+- Updated dependencies.
+
+### Removed
+
+- Removed faer backend, since faer-ext seems to be unmaintained.
+
 ## [0.2.5] - 2026-02-04
 
 ### Changed
@@ -117,7 +127,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First release of pm-remez.
 
-[unreleased]: https://github.com/maia-sdr/pm-remez/compare/v0.2.5...HEAD
+[unreleased]: https://github.com/maia-sdr/pm-remez/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/maia-sdr/pm-remez/compare/v0.2.5...v0.3.0
 [0.2.5]: https://github.com/maia-sdr/pm-remez/compare/v0.2.4...v0.2.5
 [0.2.4]: https://github.com/maia-sdr/pm-remez/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/maia-sdr/pm-remez/compare/v0.2.2...v0.2.3

@@ -1,7 +1,7 @@
 // needed because there are many unused things if there are no eigenvalue
 // backends selected via features
 #![cfg_attr(
-    not(any(feature = "lapack-backend", feature = "faer-backend")),
+    not(any(feature = "lapack-backend", feature = "nalgebra-backend")),
     allow(dead_code)
 )]
 
@@ -15,9 +15,6 @@ use std::{f64::consts::PI, sync::Arc};
 
 #[cfg(feature = "lapack-backend")]
 use pm_remez::LapackBackend;
-
-#[cfg(feature = "faer-backend")]
-use pm_remez::FaerBackend;
 
 #[cfg(feature = "nalgebra-backend")]
 use pm_remez::NalgebraBackend;
@@ -152,12 +149,6 @@ fn lowpass_lapack() {
     lowpass(&LapackBackend::default());
 }
 
-#[cfg(feature = "faer-backend")]
-#[test]
-fn lowpass_faer() {
-    lowpass(&FaerBackend::default());
-}
-
 #[cfg(feature = "nalgebra-backend")]
 #[test]
 fn lowpass_nalgebra() {
@@ -188,12 +179,6 @@ fn lowpass_stopband_weight_lapack() {
     lowpass_stopband_weight(&LapackBackend::default());
 }
 
-#[cfg(feature = "faer-backend")]
-#[test]
-fn lowpass_stopband_weight_faer() {
-    lowpass_stopband_weight(&FaerBackend::default());
-}
-
 #[cfg(feature = "nalgebra-backend")]
 #[test]
 fn lowpass_stopband_weight_nalgebra() {
@@ -222,12 +207,6 @@ fn lowpass_one_over_f<B: EigenvalueBackend<f64>>(eigenvalue_backend: &B) {
 #[test]
 fn lowpass_one_over_f_lapack() {
     lowpass_one_over_f(&LapackBackend::default());
-}
-
-#[cfg(feature = "faer-backend")]
-#[test]
-fn lowpass_one_over_f_faer() {
-    lowpass_one_over_f(&FaerBackend::default());
 }
 
 #[cfg(feature = "nalgebra-backend")]
@@ -266,12 +245,6 @@ fn lowpass_bigfloat<B: EigenvalueBackend<BigFloat>>(eigenvalue_backend: &B) {
 #[test]
 fn lowpass_bigfloat_lapack() {
     lowpass_bigfloat(&LapackBackend::default());
-}
-
-#[cfg(all(feature = "num-bigfloat", feature = "faer-backend"))]
-#[test]
-fn lowpass_bigfloat_faer() {
-    lowpass_bigfloat(&FaerBackend::default());
 }
 
 #[cfg(all(feature = "num-bigfloat", feature = "nalgebra-backend"))]
@@ -316,12 +289,6 @@ fn polyphase_filterbank_lapack() {
     polyphase_filterbank(&LapackBackend::default());
 }
 
-#[cfg(feature = "faer-backend")]
-#[test]
-fn polyphase_filterbank_faer() {
-    polyphase_filterbank(&FaerBackend::default());
-}
-
 #[cfg(feature = "nalgebra-backend")]
 #[test]
 fn polyphase_filterbank_nalgebra() {
@@ -361,12 +328,6 @@ fn bandpass<B: EigenvalueBackend<f64>>(eigenvalue_backend: &B) {
 #[test]
 fn bandpass_lapack() {
     bandpass(&LapackBackend::default());
-}
-
-#[cfg(feature = "faer-backend")]
-#[test]
-fn bandpass_faer() {
-    bandpass(&FaerBackend::default());
 }
 
 #[cfg(feature = "nalgebra-backend")]
@@ -449,12 +410,6 @@ fn cic_compensation_lapack() {
     cic_compensation(&LapackBackend::default());
 }
 
-#[cfg(feature = "faer-backend")]
-#[test]
-fn cic_compensation_faer() {
-    cic_compensation(&FaerBackend::default());
-}
-
 #[cfg(feature = "nalgebra-backend")]
 #[test]
 fn cic_compensation_nalgebra() {
@@ -507,12 +462,6 @@ fn hilbert_lapack() {
     hilbert(&LapackBackend::default());
 }
 
-#[cfg(feature = "faer-backend")]
-#[test]
-fn hilbert_faer() {
-    hilbert(&FaerBackend::default());
-}
-
 #[cfg(feature = "nalgebra-backend")]
 #[test]
 fn hilbert_nalgebra() {
@@ -561,12 +510,6 @@ fn differentiator<B: EigenvalueBackend<f64>>(eigenvalue_backend: &B) {
 #[test]
 fn differentiator_lapack() {
     differentiator(&LapackBackend::default());
-}
-
-#[cfg(feature = "faer-backend")]
-#[test]
-fn differentiator_faer() {
-    differentiator(&FaerBackend::default());
 }
 
 #[cfg(feature = "nalgebra-backend")]

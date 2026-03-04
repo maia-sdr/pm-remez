@@ -23,7 +23,8 @@ pub trait ToLapack: Sized + 'static {
     /// Converts an [`ndarray`] [`Array`] of scalars to an array of
     /// LAPACK-compatible scalars.
     ///
-    /// An implementation is provided where [`Array::map`] is used to call the
+    /// An implementation is provided where
+    /// [`ArrayRef::map`](ndarray::ArrayRef::map) is used to call the
     /// [`ToLapack::to_lapack`] method for each element of the
     /// array. Implementors of the trait can override this method with a more
     /// efficient implementation.

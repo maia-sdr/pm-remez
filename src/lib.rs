@@ -35,7 +35,7 @@
 //! `linear` or `function`.
 //!
 //! ```
-//! # #[cfg(any(feature = "lapack-backend", feature = "faer-backend", feature = "nalgebra-backend"))]
+//! # #[cfg(any(feature = "lapack-backend", feature = "nalgebra-backend"))]
 //! # fn main() -> Result<(), pm_remez::error::Error> {
 //! use pm_remez::{
 //!     constant, pm_parameters, pm_remez,
@@ -50,7 +50,7 @@
 //! let design = pm_remez(&parameters)?;
 //! # Ok(())
 //! # }
-//! # #[cfg(not(any(feature = "lapack-backend", feature = "faer-backend", feature = "nalgebra-backend")))]
+//! # #[cfg(not(any(feature = "lapack-backend", feature = "nalgebra-backend")))]
 //! # fn main() {}
 //! ```
 //!
@@ -64,7 +64,7 @@
 //! This designs the same lowpass filter using this second coding style.
 //!
 //! ```
-//! # #[cfg(any(feature = "lapack-backend", feature = "faer-backend", feature = "nalgebra-backend"))]
+//! # #[cfg(any(feature = "lapack-backend", feature = "nalgebra-backend"))]
 //! # fn main() -> Result<(), pm_remez::error::Error> {
 //! use pm_remez::{pm_remez, Band, BandSetting, PMParameters};
 //! let num_taps = 35;
@@ -77,7 +77,7 @@
 //! let design = pm_remez(&parameters)?;
 //! # Ok(())
 //! # }
-//! # #[cfg(not(any(feature = "lapack-backend", feature = "faer-backend", feature = "nalgebra-backend")))]
+//! # #[cfg(not(any(feature = "lapack-backend", feature = "nalgebra-backend")))]
 //! # fn main() {}
 //! ```
 //!
@@ -90,8 +90,7 @@
 //!
 //! The `pm_remez` crate supports different backends to solve eigenvalue
 //! problems. These are selected with feature flags. See [`EigenvalueBackend`]
-//! for more details. By default, only the faer backend is enabled, which is a
-//! pure Rust implementation.
+//! for more details. By default, only the nalgebra backend is enabled.
 //!
 //! Another supported backend uses `ndarray_linalg` to solve eigenvalue
 //! problems with LAPACK. It is enabled with the `lapack-backend` feature flag.
@@ -141,15 +140,9 @@ pub use convf64::Convf64;
 mod chebyshev;
 use chebyshev::{chebyshev_nodes, compute_cheby_coefficients};
 mod eigenvalues;
-#[cfg(any(
-    feature = "faer-backend",
-    feature = "lapack-backend",
-    feature = "nalgebra-backend"
-))]
+#[cfg(any(feature = "lapack-backend", feature = "nalgebra-backend"))]
 pub use eigenvalues::DefaultEigenvalueBackend;
 pub use eigenvalues::EigenvalueBackend;
-#[cfg(feature = "faer-backend")]
-pub use eigenvalues::FaerBackend;
 #[cfg(feature = "lapack-backend")]
 pub use eigenvalues::LapackBackend;
 #[cfg(feature = "nalgebra-backend")]
@@ -167,11 +160,7 @@ pub use lapack::{IsLapack, ToLapack};
 pub mod order_estimates;
 #[cfg(all(
     feature = "python",
-    any(
-        feature = "faer-backend",
-        feature = "lapack-backend",
-        feature = "nalgebra-backend"
-    )
+    any(feature = "lapack-backend", feature = "nalgebra-backend")
 ))]
 mod python;
 mod requirements;
@@ -203,11 +192,7 @@ pub use types::{Band, DesignParameters, PMDesign, PMParameters, ParametersBuilde
 ///
 /// See the [crate-level examples](crate#examples) for examples about how to use
 /// this function in each of the two coding styles provided by this crate.
-#[cfg(any(
-    feature = "lapack-backend",
-    feature = "faer-backend",
-    feature = "nalgebra-backend"
-))]
+#[cfg(any(feature = "lapack-backend", feature = "nalgebra-backend"))]
 pub fn pm_remez<T, P>(parameters: &P) -> Result<PMDesign<T>>
 where
     T: Float + FloatConst,
