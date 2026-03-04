@@ -58,8 +58,10 @@ jobs:
     - name: Run tests
       env:
         # Opt out of LLD when using intel-mkl. See https://github.com/rust-lang/rust/issues/147156
-        RUSTFLAGS: ${{ matrix.lapack == 'lapack-backend,intel-mkl-system' && '-Clinker-features=-lld' || '' }}
-        RUSTDOCFLAGS: ${{ matrix.lapack == 'lapack-backend,intel-mkl-system' && '-Clinker-features=-lld' || '' }}
+        # Also explicitly link against the intel-mkl libraries, since without this I was
+        # still getting undefined symbol errors when linking (potentially due to -Wl,--as-needed)
+        RUSTFLAGS: ${{ matrix.lapack == 'lapack-backend,intel-mkl-system' && '-Clinker-features=-lld -lmkl_intel_lp64 -lmkl_sequential -lmkl_core' || '' }}
+        RUSTDOCFLAGS: ${{ matrix.lapack == 'lapack-backend,intel-mkl-system' && '-Clinker-features=-lld -Clink-arg=-lmkl_intel_lp64 -Clink-arg=-lmkl_sequential -Clink-arg=-lmkl_core' || '' }}
       run: cargo test --verbose --features ${{matrix.lapack}},${{matrix.nalgebra}},${{matrix.python}}, --no-default-features
 
   publish:
