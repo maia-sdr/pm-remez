@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-04-27
+
+### Changed
+
+- Updated dependencies.
+
 ## [0.3.1] - 2026-04-09
 
 ### Changed
@@ -133,7 +139,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First release of pm-remez.
 
-[unreleased]: https://github.com/maia-sdr/pm-remez/compare/v0.3.1...HEAD
+[unreleased]: https://github.com/maia-sdr/pm-remez/compare/v0.3.2...HEAD
+[0.3.2]: https://github.com/maia-sdr/pm-remez/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/maia-sdr/pm-remez/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/maia-sdr/pm-remez/compare/v0.2.5...v0.3.0
 [0.2.5]: https://github.com/maia-sdr/pm-remez/compare/v0.2.4...v0.2.5
