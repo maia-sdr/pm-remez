@@ -14,7 +14,7 @@ babel==2.18.0
     #   sphinx
 beautifulsoup4==4.14.3
     # via pydata-sphinx-theme
-certifi==2026.2.25
+certifi==2026.4.22
     # via requests
 charset-normalizer==3.4.7
     # via requests
@@ -28,7 +28,7 @@ docutils==0.22.4
     #   sphinx
 fonttools==4.62.1
     # via matplotlib
-idna==3.11
+idna==3.14
     # via requests
 imagesize==2.0.0
     # via sphinx
@@ -38,7 +38,7 @@ kiwisolver==1.5.0
     # via matplotlib
 markupsafe==3.0.3
     # via jinja2
-matplotlib==3.10.8
+matplotlib==3.10.9
     # via -r requirements.in
 numpy==2.4.4
     # via
@@ -48,13 +48,13 @@ numpy==2.4.4
     #   scipy
 numpydoc==1.10.0
     # via -r requirements.in
-packaging==26.0
+packaging==26.2
     # via
     #   matplotlib
     #   sphinx
 pillow==12.2.0
     # via matplotlib
-pydata-sphinx-theme==0.17.0
+pydata-sphinx-theme==0.17.1
     # via -r requirements.in
 pygments==2.20.0
     # via
@@ -65,7 +65,7 @@ pyparsing==3.3.2
     # via matplotlib
 python-dateutil==2.9.0.post0
     # via matplotlib
-requests==2.33.1
+requests==2.34.0
     # via sphinx
 roman-numerals==4.1.0
     # via sphinx
@@ -98,5 +98,5 @@ typing-extensions==4.15.0
     # via
     #   beautifulsoup4
     #   pydata-sphinx-theme
-urllib3==2.6.3
+urllib3==2.7.0
     # via requests
