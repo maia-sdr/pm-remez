@@ -14,7 +14,7 @@ babel==2.18.0
     #   sphinx
 beautifulsoup4==4.14.3
     # via pydata-sphinx-theme
-certifi==2026.4.22
+certifi==2026.5.20
     # via requests
 charset-normalizer==3.4.7
     # via requests
@@ -26,9 +26,9 @@ docutils==0.22.4
     # via
     #   pydata-sphinx-theme
     #   sphinx
-fonttools==4.62.1
+fonttools==4.63.0
     # via matplotlib
-idna==3.14
+idna==3.17
     # via requests
 imagesize==2.0.0
     # via sphinx
@@ -40,7 +40,7 @@ markupsafe==3.0.3
     # via jinja2
 matplotlib==3.10.9
     # via -r requirements.in
-numpy==2.4.4
+numpy==2.4.6
     # via
     #   -r requirements.in
     #   contourpy
@@ -54,7 +54,7 @@ packaging==26.2
     #   sphinx
 pillow==12.2.0
     # via matplotlib
-pydata-sphinx-theme==0.17.1
+pydata-sphinx-theme==0.18.0
     # via -r requirements.in
 pygments==2.20.0
     # via
@@ -65,7 +65,7 @@ pyparsing==3.3.2
     # via matplotlib
 python-dateutil==2.9.0.post0
     # via matplotlib
-requests==2.34.0
+requests==2.34.2
     # via sphinx
 roman-numerals==4.1.0
     # via sphinx
@@ -73,9 +73,9 @@ scipy==1.17.1
     # via -r requirements.in
 six==1.17.0
     # via python-dateutil
-snowballstemmer==3.0.1
+snowballstemmer==3.1.0
     # via sphinx
-soupsieve==2.8.3
+soupsieve==2.8.4
     # via beautifulsoup4
 sphinx==9.1.0
     # via

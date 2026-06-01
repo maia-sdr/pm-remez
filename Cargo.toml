@@ -1,6 +1,6 @@
 [package]
 name = "pm-remez"
-version = "0.3.2"
+version = "0.3.3"
 edition = "2024"
 authors = ["Daniel Estevez <daniel@destevez.net>"]
 description = "Parks-McClellan Remez FIR design algorithm"
@@ -19,7 +19,7 @@ crate-type = ["cdylib", "rlib"]
 default = ["nalgebra-backend"]
 
 # LAPACK eigenvalue backend using ndarray-linalg
-lapack-backend = ["dep:ndarray-linalg"]
+lapack-backend = ["dep:ndarray-linalg", "dep:openblas-src"]
 # nalgebra eigenvalue backend
 nalgebra-backend = ["dep:nalgebra"]
 
@@ -44,6 +44,12 @@ num-bigfloat = { version = "1.7.1", optional = true }
 num-traits = "0.2"
 pyo3 = { version = "0.28", optional = true, features = ["abi3-py38", "extension-module"] }
 thiserror = "2"
+# Temporarily added to prevent breakage:
+#
+# ndarray-linalg v0.18.1, pulls in lax v0.18.0, which pulls in openblas-src
+# v0.10.16. However, this version of openblas-src needs either the rustls or the
+# native-tls feature flags, but openblas-src is passing neither.
+openblas-src = { version = "0.10.16", optional = true, features = ["rustls"] }
 
 [dev-dependencies]
 rustfft = "6.2"
