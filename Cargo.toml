@@ -19,7 +19,7 @@ crate-type = ["cdylib", "rlib"]
 default = ["nalgebra-backend"]
 
 # LAPACK eigenvalue backend using ndarray-linalg
-lapack-backend = ["dep:ndarray-linalg", "dep:openblas-src"]
+lapack-backend = ["dep:ndarray-linalg"]
 # nalgebra eigenvalue backend
 nalgebra-backend = ["dep:nalgebra"]
 
@@ -36,20 +36,14 @@ python = ["pyo3", "num-bigfloat"]
 
 [dependencies]
 itertools = "0.14"
-nalgebra = { version = "0.34", optional = true }
+nalgebra = { version = "0.35", optional = true }
 ndarray = "0.17"
 ndarray-linalg = { version = "0.18", default-features = false, optional = true }
 num-complex = "0.4.3"
 num-bigfloat = { version = "1.7.1", optional = true }
 num-traits = "0.2"
-pyo3 = { version = "0.28", optional = true, features = ["abi3-py38", "extension-module"] }
+pyo3 = { version = "0.29", optional = true, features = ["abi3-py38", "extension-module"] }
 thiserror = "2"
-# Temporarily added to prevent breakage:
-#
-# ndarray-linalg v0.18.1, pulls in lax v0.18.0, which pulls in openblas-src
-# v0.10.16. However, this version of openblas-src needs either the rustls or the
-# native-tls feature flags, but openblas-src is passing neither.
-openblas-src = { version = "0.10.16", optional = true, features = ["rustls"] }
 
 [dev-dependencies]
 rustfft = "6.2"
