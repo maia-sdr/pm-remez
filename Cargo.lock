@@ -1043,7 +1043,7 @@ checksum = "19f132c84eca552bf34cab8ec81f1c1dcc229b811638f9d283dceabe58c5569e"
 
 [[package]]
 name = "pm-remez"
-version = "0.3.3"
+version = "0.3.4"
 dependencies = [
  "itertools",
  "nalgebra",
