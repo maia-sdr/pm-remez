@@ -1,6 +1,6 @@
 [package]
 name = "pm-remez"
-version = "0.3.4"
+version = "0.3.5"
 edition = "2024"
 authors = ["Daniel Estevez <daniel@destevez.net>"]
 description = "Parks-McClellan Remez FIR design algorithm"
@@ -35,7 +35,7 @@ intel-mkl-system = ["lapack-backend", "ndarray-linalg/intel-mkl-system"]
 python = ["pyo3", "num-bigfloat"]
 
 [dependencies]
-itertools = "0.14"
+itertools = "0.15"
 nalgebra = { version = "0.35", optional = true }
 ndarray = "0.17"
 ndarray-linalg = { version = "0.18", default-features = false, optional = true }
