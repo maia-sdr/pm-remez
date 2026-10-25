@@ -7,9 +7,9 @@ version: 2
 
 # Set the OS, Python version and other tools you might need
 build:
-  os: ubuntu-24.04
+  os: ubuntu-26.04
   tools:
-    python: "3.12"
+    python: "3.14"
     # The "latest" rust version of read the docs is usually
     # quite old. We install the latest version with asdf below.
     #
