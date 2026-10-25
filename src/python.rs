@@ -657,8 +657,8 @@ where
     DefaultEigenvalueBackend: EigenvalueBackend<T>,
 {
     let mut settings = Vec::with_capacity(desired.len());
-    let bands = bands.chunks_exact(2);
-    for (j, (band, des)) in bands.zip(&desired).enumerate() {
+    let bands = bands.as_chunks::<2>().0;
+    for (j, (band, des)) in bands.iter().zip(&desired).enumerate() {
         let des = pyany_to_setting(des, "desired", fs)?;
         let mut setting =
             BandSetting::new(T::from_f64(band[0] / fs), T::from_f64(band[1] / fs), des)?;
@@ -674,7 +674,7 @@ where
 }
 
 #[derive(Debug, Clone)]
-#[pyclass(skip_from_py_object)]
+#[pyclass]
 struct PMDesign(crate::PMDesign<f64>);
 
 #[pymethods]
